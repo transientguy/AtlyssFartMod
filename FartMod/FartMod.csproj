@@ -87,6 +87,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="AssetUtils.cs" />
+    <Compile Include="Configuration.cs" />
     <Compile Include="FartController.cs" />
     <Compile Include="FartEffectsManager.cs" />
     <Compile Include="FartModCore.cs" />

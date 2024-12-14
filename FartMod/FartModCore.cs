@@ -8,6 +8,7 @@ using System.Collections;
 using HarmonyLib;
 using System;
 using Mirror;
+using BepInEx.Configuration;
 
 namespace FartMod
 {
@@ -15,6 +16,7 @@ namespace FartMod
     public class FartModCore : BaseUnityPlugin
     {
         internal static new ManualLogSource Logger;
+        internal static ConfigFile GetConfig() => instance.Config;
 
         public static FartModCore instance;
         private FartController originalFartController;
@@ -30,6 +32,7 @@ namespace FartMod
             instance = this;
             Logger = base.Logger;
 
+            Configuration.BindConfiguration();
             Harmony val = new Harmony("FartMod");
             try
             {
@@ -54,9 +57,83 @@ namespace FartMod
             FartCommands.AddCommand("fartinfinite", "Rippin ass!", FartLoopInfinite);
             FartCommands.AddCommand("stopfarting", "", StopFarting);
 
-            //FartCommands.AddCommand("allanimations", "", AllAnims);
+            FartCommands.AddHostCommand("rebind", "", Rebind);
+
+            FartCommands.AddHostCommand("fartchaos", "", ToggleFartChaos);
+
+            FartCommands.AddHostCommand("fartvolume", "", SetFartVolume);
+            FartCommands.AddHostCommand("globalfartvolume", "", SetGlobalFartVolume);
+            FartCommands.AddHostCommand("fartsize", "", SetFarticleSize);
+            FartCommands.AddHostCommand("fartjiggle", "", SetFartJiggle);
 
             Log("Fart Commands loaded");
+        }
+
+        private void Rebind(ChatBehaviour chatBehaviour, List<string> parameters) 
+        {
+            Log("Config file rebound!");
+            GetConfig().Reload();
+        }
+
+        private void ToggleFartChaos(ChatBehaviour chatBehaviour, List<string> parameters)
+        {
+            Configuration.FartChaos.Value = !Configuration.FartChaos.Value;
+            string onMessage = Configuration.FartChaos.Value ? "on" : "off";
+            Log("Fart chaos " + onMessage + "!");
+        }
+
+        private float GetFloat(List<string> parameters, int index, float defaultValue, out bool success) 
+        {
+            if (index >= parameters.Count) 
+            {
+                Log("Not enough parameters given for command");
+                success = false;
+                return defaultValue;
+            }
+
+            if (float.TryParse(parameters[index], out float value))
+            {
+                success = true;
+                return value;
+            }
+            else 
+            {
+                Log("Given parameter " + parameters[index] + " is of incorrect type");
+                success = false;
+                return defaultValue;
+            }
+        }
+
+        private void SetFartVolume(ChatBehaviour chatBehaviour, List<string> parameters)
+        {
+            Configuration.FartVolume.Value = GetFloat(parameters, 0, Configuration.FartVolume.Value, out bool b);
+
+            if (b)
+                Log("Set fart volume to " + Configuration.FartVolume.Value + "!");
+        }
+
+        private void SetGlobalFartVolume(ChatBehaviour chatBehaviour, List<string> parameters)
+        {
+            Configuration.GlobalFartVolume.Value = GetFloat(parameters, 0, Configuration.FartVolume.Value, out bool b);
+
+            if (b)
+                Log("Set global fart volume to " + Configuration.GlobalFartVolume.Value + "!");
+        }
+
+        private void SetFarticleSize(ChatBehaviour chatBehaviour, List<string> parameters)
+        {
+            Configuration.FartParticleSize.Value = GetFloat(parameters, 0, Configuration.FartVolume.Value, out bool b);
+
+            if (b)
+                Log("Set fart particle size to " + Configuration.FartParticleSize.Value + "!");
+        }
+
+        private void SetFartJiggle(ChatBehaviour chatBehaviour, List<string> parameters)
+        {
+            Configuration.JiggleIntensity.Value = GetFloat(parameters, 0, Configuration.FartVolume.Value, out bool b);
+
+            if (b)
+                Log("Set fart jiggle intensity to " + Configuration.JiggleIntensity.Value + "!");
         }
 
         private void AllAnims(ChatBehaviour chatBehaviour)
@@ -76,7 +153,7 @@ namespace FartMod
             }
         }
 
-        private void FartLoop(ChatBehaviour chatBehaviour) 
+        private void FartLoop(ChatBehaviour chatBehaviour, List<string> parameters) 
         {
             FartController controller = GetCharacterFartController(chatBehaviour);
 
@@ -84,7 +161,7 @@ namespace FartMod
                 controller.FartLoop();
         }
 
-        private void FartOneshot(ChatBehaviour chatBehaviour)
+        private void FartOneshot(ChatBehaviour chatBehaviour, List<string> parameters)
         {
             FartController controller = GetCharacterFartController(chatBehaviour);
 
@@ -92,7 +169,7 @@ namespace FartMod
                 controller.FartOneshot();
         }
 
-        private void FartLoopInfinite(ChatBehaviour chatBehaviour)
+        private void FartLoopInfinite(ChatBehaviour chatBehaviour, List<string> parameters)
         {
             FartController controller = GetCharacterFartController(chatBehaviour);
 
@@ -100,7 +177,7 @@ namespace FartMod
                 controller.FartLoopInfinite();
         }
 
-        private void StopFarting(ChatBehaviour chatBehaviour)
+        private void StopFarting(ChatBehaviour chatBehaviour, List<string> parameters)
         {
             FartController controller = GetCharacterFartController(chatBehaviour);
 
@@ -156,9 +233,9 @@ namespace FartMod
         {
             public string commandKey;
             public string commandMessage;
-            public Action<ChatBehaviour> action;
+            public Action<ChatBehaviour, List<string>> action;
 
-            public ChatCommand(string commandKey, string commandMessage, Action<ChatBehaviour> action) 
+            public ChatCommand(string commandKey, string commandMessage, Action<ChatBehaviour, List<string>> action) 
             {
                 this.commandKey = commandKey;
                 this.action = action;
@@ -166,9 +243,14 @@ namespace FartMod
 
             public void InvokeAction(ChatBehaviour chatBehaviour) 
             {
-                action.Invoke(chatBehaviour);
+                InvokeAction(chatBehaviour, new List<string>());
+            }
 
-                if(!string.IsNullOrEmpty(commandMessage))
+            public void InvokeAction(ChatBehaviour chatBehaviour, List<string> parameters)
+            {
+                action.Invoke(chatBehaviour, parameters);
+
+                if (!string.IsNullOrEmpty(commandMessage))
                     chatBehaviour.New_ChatMessage("<color=#ea8e09> " + commandMessage + "</color>");
             }
         }
@@ -177,6 +259,7 @@ namespace FartMod
         {
             public static ChatBehaviour playerChat;
             public static List<ChatCommand> allChatCommands = new List<ChatCommand>();
+            public static List<ChatCommand> hostChatCommands = new List<ChatCommand>();
 
             public static ChatBehaviour GetPlayerChat() 
             {
@@ -191,59 +274,54 @@ namespace FartMod
                 return playerChat;
             }
 
-            private static bool CheckCommandReceived(ChatBehaviour __instance, string _message) 
-            {
-                //Check if any command is within message for performance
-                bool containsCommand = false;
-                foreach (ChatCommand command in allChatCommands)
-                {
-                    if (_message.Contains(command.commandKey)) 
-                    {
-                        containsCommand = true;
-                        break;
-                    }
-                }
-                
-                //Return if no command contained
-                if (!containsCommand)
-                    return false;
-
-                //Split message by /
-                string[] splitStr = _message.Split('/');
-                foreach (string str in splitStr) 
-                {
-                    //remove color code special character
-                    string commandToCheck = str.Replace("<", "");
-
-                    foreach (ChatCommand command in allChatCommands)
-                    {
-                        if (commandToCheck == command.commandKey)
-                        {
-                            command.InvokeAction(__instance);
-                            return false;
-                        }
-                    }
-                }
-
-                return true;
-            }
-
-            public static void AddCommand(string commandKey, string commandMessage, Action<ChatBehaviour> action) 
+            public static void AddCommand(string commandKey, string commandMessage, Action<ChatBehaviour, List<string>> action) 
             {
                 allChatCommands.Add(new ChatCommand(commandKey, commandMessage, action));
             }
 
-            /*
+            public static void AddHostCommand(string commandKey, string commandMessage, Action<ChatBehaviour, List<string>> action)
+            {
+                hostChatCommands.Add(new ChatCommand(commandKey, commandMessage, action));
+            }
+
             [HarmonyPatch(typeof(ChatBehaviour), "Send_ChatMessage")]
             public static class AddCommandsPatch
             {
                 [HarmonyPrefix]
                 public static bool Send_ChatMessage_Prefix(ChatBehaviour __instance, string _message)
                 {
-                    return CheckCommand(__instance, _message);
+                    if (CheckHostCommand(__instance, _message))
+                        return false;
+
+                    return true;
                 }
             }
-            */
+
+            private static bool CheckHostCommand(ChatBehaviour __instance, string _message)
+            {
+                if (_message == null)
+                    return false;
+
+                if (!_message.Any())
+                    return false;
+
+                if (_message[0] != '/')
+                    return false;
+
+                _message = _message.Substring(1);
+                List<string> parameters = _message.Split(' ').ToList();
+                ChatCommand command = hostChatCommands.Find(x => parameters[0] == x.commandKey);
+
+                if (command != null) 
+                {
+                    parameters.RemoveAt(0);
+                    parameters = parameters.Where(x => !string.IsNullOrEmpty(x)).ToList();
+                    command.InvokeAction(__instance, parameters);
+                    return true;
+                }
+
+                return false;
+            }
 
             //Patch received message for now as i have no idea how to send commands to the server otherwise
             [HarmonyPatch(typeof(ChatBehaviour), "InvokeUserCode_Rpc_RecieveChatMessage__String__Boolean__ChatChannel")]
@@ -260,10 +338,52 @@ namespace FartMod
                         {
                             string _message = playerChat._chatMessages[playerChat._chatMessages.Count - 1];
                             ChatBehaviour chat = obj as ChatBehaviour;
-                            CheckCommandReceived(chat, _message);
+
+                            bool command = CheckRPCCommandReceived(chat, _message);
+
+                            //For farting chaos fun!
+                            if (Configuration.FartChaos.Value && !command && chat != playerChat)
+                                instance.FartLoop(chat, new List<string>());
                         }
                     }
                 }
+            }
+
+            private static bool CheckRPCCommandReceived(ChatBehaviour __instance, string _message)
+            {
+                //Check if any command is within message for performance
+                bool containsCommand = false;
+                foreach (ChatCommand command in allChatCommands)
+                {
+                    if (_message.Contains(command.commandKey))
+                    {
+                        containsCommand = true;
+                        break;
+                    }
+                }
+
+                //Return if no command contained
+                if (!containsCommand)
+                    return false;
+
+                //Split message by /
+                string[] splitStr = _message.Split('/');
+                foreach (string str in splitStr)
+                {
+                    //remove color code special character
+                    string commandToCheck = str.Replace("<", "");
+
+                    foreach (ChatCommand command in allChatCommands)
+                    {
+                        if (commandToCheck == command.commandKey)
+                        {
+                            command.InvokeAction(__instance);
+                            return true;
+                        }
+                    }
+                }
+
+                return false;
             }
         }
     }

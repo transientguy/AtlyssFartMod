@@ -1,4 +1,6 @@
-﻿using System.IO;
+﻿using System.Collections.Generic;
+using System.IO;
+using System.Reflection;
 using UnityEngine;
 using UnityEngine.Networking;
 
@@ -89,6 +91,45 @@ namespace FartMod
                 return dac.audioClip;
 
             return null;
+        }
+
+        public static List<AudioClip> PreloadAudioClips(string folderName)
+        {
+            List<AudioClip> sounds = new List<AudioClip>();
+            Log("Checking Sounds");
+
+            string audioPathName = folderName;
+            string path = Path.Combine(Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location), audioPathName);
+            if (Directory.Exists(path))
+            {
+                sounds.Clear();
+                CollectAudioFiles(path);
+            }
+            else
+            {
+                Log($"Directory {path} does not exist! Creating.");
+                Directory.CreateDirectory(path);
+            }
+
+            return sounds;
+        }
+
+        private static List<AudioClip> CollectAudioFiles(string path)
+        {
+            List<AudioClip> sounds = new List<AudioClip>();
+
+            Log($"checking folder {Path.GetFileName(path)}");
+            string[] audioFiles = Directory.GetFiles(path);
+            foreach (string file in audioFiles)
+            {
+                Log($"\tchecking single file {Path.GetFileName(file)}");
+                AudioClip clip = AssetUtils.LoadAudioFromWebRequest(file, AudioType.UNKNOWN);
+
+                if (clip)
+                    sounds.Add(clip);
+            }
+
+            return sounds;
         }
     }
 }
