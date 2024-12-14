@@ -11,6 +11,9 @@ BepInEx 5
 ### Commands
 
 /fart - starts fart emote loop
+
 /fartoneshot - does simple oneshot fart
+
 /fartinfinite - starts an infinite loop of farting
+
 /stopfarting - stops the infinite loop of farting
