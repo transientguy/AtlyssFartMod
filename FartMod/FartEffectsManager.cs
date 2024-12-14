@@ -90,6 +90,9 @@ namespace FartMod
             if (!audioSource)
                 audioSource = FartController.AddAndGetComponent<AudioSource>(gameObject);
 
+            if(audioSource)
+                audioSource.volume = configuration.GetVolume();
+            
             return audioSource;
         }
 
