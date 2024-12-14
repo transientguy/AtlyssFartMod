@@ -25,3 +25,7 @@ BepInEx 5
 /fartsize - sets fart particle size i.e: /fartsize .5
 
 /fartjiggle - sets fart butt jiggle multiplier i.e: /fartjiggle 2
+
+/rebind - rebinds config file
+
+/fartchaos - toggle fart chaos effect which makes all multiplayer characters fart when they chat
