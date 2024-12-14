@@ -29,3 +29,22 @@ BepInEx 5
 /rebind - rebinds config file
 
 /fartchaos - toggle fart chaos effect which makes all multiplayer characters fart when they chat
+
+### Config File
+
+Config file located: ATLYSS\BepInEx\config\TransientGuy.Atlyss.FartMod.cfg
+
+FartVolume: volume of player character's farts
+
+FartParticleSize: Size of player character's fart particles
+
+JiggleIntensity: Jiggle intensity of player character's butt when farting
+
+FartParticleStartColors: Hexedecimal list of colors for the fart particle's start gradient (only supports up to 3)
+
+FartParticleEndColors: Hexedecimal list of colors for the fart particle's end gradient (only supports up to 3)
+
+FartChaos: Experimental mode that makes all multiplayer character's fart when they chat
+
+GlobalFartVolume: Volume of all character farts
+
