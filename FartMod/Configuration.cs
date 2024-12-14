@@ -21,7 +21,7 @@ namespace FartMod
         internal static void BindConfiguration()
         {
             //Player effects
-            FartVolume = FartModCore.GetConfig().Bind("Fart Effects", "FartVolume", 0.025f, "The volume of your character's farts");
+            FartVolume = FartModCore.GetConfig().Bind("Fart Effects", "FartVolume", 0.08f, "The volume of your character's farts");
             FartParticleSize = FartModCore.GetConfig().Bind("Fart Effects", "FartParticleSize", .075f, "The size of the fart particle effect.");
             JiggleIntensity = FartModCore.GetConfig().Bind("Fart Effects", "JiggleIntensity", 1f, "Multiplier for how intense your butt jiggles from farts.");
 
@@ -52,6 +52,7 @@ namespace FartMod
 
         public static List<Color> GetColors(string config)
         {
+            config = config.Replace(" ", "");
             List<string> colorHexa = config.Split(',').ToList();
             List<Color> colors = new List<Color>();
 
