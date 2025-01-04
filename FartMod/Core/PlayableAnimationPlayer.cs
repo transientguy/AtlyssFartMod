@@ -126,4 +126,50 @@ namespace FartMod
             this.infinite = infinite;
         }
     }
+
+    public class CurrentAnimationMonitor
+    {
+        public Animator animator;
+        public int layer;
+        public AnimationClip currentClip;
+        public List<AnimationClip> clipsToIgnore = new List<AnimationClip>();
+
+        public CurrentAnimationMonitor(Animator animator, int layer)
+        {
+            this.animator = animator;
+            this.layer = layer;
+            currentClip = GetCurrentClip();
+        }
+
+        public AnimationClip GetCurrentClip()
+        {
+            AnimatorClipInfo[] animatorInfo = this.animator.GetCurrentAnimatorClipInfo(layer);
+
+            if (animatorInfo.Any())
+                return animatorInfo[0].clip;
+
+            return null;
+        }
+
+        public string Debug()
+        {
+            string message = animator.GetLayerName(layer);
+
+            AnimationClip clip = GetCurrentClip();
+            if (clip)
+                message += " " + clip.name;
+
+            return message;
+        }
+
+        public bool IsDifferent()
+        {
+            AnimationClip clip = GetCurrentClip();
+
+            if (clipsToIgnore.Contains(clip))
+                return false;
+
+            return currentClip != clip;
+        }
+    }
 }

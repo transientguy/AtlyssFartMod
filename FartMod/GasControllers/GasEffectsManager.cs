@@ -1,16 +1,17 @@
-﻿using System.Reflection;
-using UnityEngine;
+﻿using System.Collections;
 using System.Collections.Generic;
 using System.IO;
-using System.Collections;
 using System.Linq;
+using System.Reflection;
+using System.Text;
+using System.Threading.Tasks;
+using UnityEngine;
 using static UnityEngine.ParticleSystem;
 
 namespace FartMod
 {
-    public class FartEffectsManager : MonoBehaviour
+    public class GasEffectsManager : MonoBehaviour
     {
-        private static List<AudioClip> sounds = new List<AudioClip>();
         private static GameObject particleSystemPrefab;
 
         public Player owner;
@@ -24,17 +25,22 @@ namespace FartMod
 
         private float counter;
 
-        private FartEffectsConfiguration configuration = new FartEffectsConfiguration();
+        protected GasEffectsConfiguration configuration = new GasEffectsConfiguration();
 
         //Network Audio
         //Network Particles
 
+        protected virtual GasEffectsConfiguration GetGasEffectsConfiguration() 
+        {
+            return new GasEffectsConfiguration(this);
+        }
+
         public void Initialize(AssetBundle bundle)
         {
             this.bundle = bundle;
-            
-            configuration = new FartEffectsConfiguration(this);
-            PreloadAudioClips();
+
+            configuration = GetGasEffectsConfiguration();
+            GetAudioClips();
             GetParticleSystemPrefab();
             GetAudioSource();
             GetParticleSystem();
@@ -50,29 +56,35 @@ namespace FartMod
             return particleSystemPrefab;
         }
 
-        private void PreloadAudioClips()
+        protected virtual List<AudioClip> GetAudioClips()
         {
-            if (sounds.Any())
-                return;
+            return new List<AudioClip>();
+        }
+
+        protected List<AudioClip> CollectAudioFilesFromPath(string audioPathName)
+        {
+            List<AudioClip> sounds = new List<AudioClip>();
 
             Log("Checking Sounds");
 
-            string audioPathName = "Audio";
             string path = Path.Combine(Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location), audioPathName);
             if (Directory.Exists(path))
             {
-                sounds.Clear();
-                CollectAudioFiles(path);
+                sounds = CollectAudioFiles(path);
             }
             else
             {
                 Log($"Directory {path} does not exist! Creating.");
                 Directory.CreateDirectory(path);
             }
+
+            return sounds;
         }
 
-        private void CollectAudioFiles(string path)
+        private List<AudioClip> CollectAudioFiles(string path)
         {
+            List<AudioClip> sounds = new List<AudioClip>();
+
             Log($"checking folder {Path.GetFileName(path)}");
             string[] audioFiles = Directory.GetFiles(path);
             foreach (string file in audioFiles)
@@ -83,6 +95,8 @@ namespace FartMod
                 if (clip)
                     sounds.Add(clip);
             }
+
+            return sounds;
         }
 
         private AudioSource GetAudioSource()
@@ -90,9 +104,9 @@ namespace FartMod
             if (!audioSource)
                 audioSource = FartController.AddAndGetComponent<AudioSource>(gameObject);
 
-            if(audioSource)
+            if (audioSource)
                 audioSource.volume = configuration.GetVolume();
-            
+
             return audioSource;
         }
 
@@ -114,12 +128,18 @@ namespace FartMod
 
         public void StartEffect()
         {
+            if (!GetAudioClips().Any()) 
+            {
+                Log("No clips found of either farts or burps!");
+                return;
+            }
+
             //Reset counter;
             counter = 0;
 
             //Grab random clip
-            int randIndex = Random.Range(0, sounds.Count);
-            AudioClip clip = sounds[randIndex];
+            int randIndex = Random.Range(0, GetAudioClips().Count);
+            AudioClip clip = GetAudioClips()[randIndex];
 
             //Set clip and play
             GetAudioSource().clip = clip;
@@ -140,7 +160,7 @@ namespace FartMod
             enabled = true;
         }
 
-        private Vector3 AssDirection(Player player)
+        protected virtual Vector3 EffectDirection(Player player)
         {
             Vector3 averagePosition = Vector3.zero;
 
@@ -154,7 +174,7 @@ namespace FartMod
             return (averagePosition / assBones.Length);
         }
 
-        private Vector3 AssPosition(Player player)
+        protected virtual Vector3 EffectPosition(Player player)
         {
             Vector3 averagePosition = Vector3.zero;
 
@@ -168,7 +188,7 @@ namespace FartMod
             return (averagePosition / assBones.Length);
         }
 
-        private Player GetPlayer()
+        protected Player GetPlayer()
         {
             return owner;
         }
@@ -225,7 +245,7 @@ namespace FartMod
             return GetGasParticle().colorOverLifetime.color.gradientMin;
         }
 
-        private void SetEffectEnabled(bool b) 
+        protected virtual void SetEffectEnabled(bool b)
         {
             StopAllCoroutines();
 
@@ -241,38 +261,37 @@ namespace FartMod
                 var.color = new MinMaxGradient(endGradient, startGradient);
 
                 StartCoroutine(EyeConditionRoutine());
-                StartCoroutine(JiggleRoutine());
             }
-            else 
+            else
             {
                 GetAudioSource().Stop();
+                SetEyeConditions(false);
             }
 
-            SetJiggleForce(0);
             SetParticleEnabled(b);
             effectPlaying = b;
         }
 
-        public void SetTransform(Transform t) 
+        public void SetTransform(Transform t)
         {
             Player player = GetPlayer();
 
             if (!player)
                 return;
 
-            t.forward = AssDirection(player);
-            t.position = AssPosition(player) + t.forward * .75f;
+            t.forward = EffectDirection(player);
+            t.position = EffectPosition(player) + t.forward * .75f;
         }
 
-        private void Update() 
+        private void Update()
         {
-            if (!GetAudioSource().clip) 
+            if (!GetAudioSource().clip)
             {
                 enabled = false;
                 return;
             }
 
-            if (counter >= GetAudioSource().clip.length) 
+            if (counter >= GetAudioSource().clip.length)
             {
                 enabled = false;
                 return;
@@ -297,7 +316,7 @@ namespace FartMod
                 if (!effectPlaying)
                     SetEffectEnabled(true);
             }
-            else 
+            else
             {
                 if (effectPlaying)
                     SetEffectEnabled(false);
@@ -306,57 +325,7 @@ namespace FartMod
             counter += Time.deltaTime;
         }
 
-        private void SetJiggleForce(float forceMultiplier) 
-        {
-            Player player = GetPlayer();
-
-            if (!player)
-                return;
-
-            //Jiggle dynamic bones
-            float randPower = Random.Range(0.0003f, 0.0006f);
-            float forcePower = randPower * forceMultiplier;
-
-            //Jiggle dat ass
-            DynamicBone[] assBones = player._pVisual._playerRaceModel._assDynamicBones;
-            for (int i = 0; i < assBones.Length; i++)
-            {
-                DynamicBone assBone = assBones[i];
-                float multiplier = ((i + 1) % 2) == 0 ? 1 : -1;
-                Vector3 force = player.transform.right * multiplier * forcePower;
-                assBone.m_Force = force;
-            }
-
-            //Jiggle tail
-            List<DynamicBone> dynamicBones = new List<DynamicBone>(player.gameObject.GetComponentsInChildren<DynamicBone>());
-            DynamicBone tailBone = dynamicBones.Find(x => x.name.Contains("tail"));
-
-            if (tailBone)
-            {
-                Vector3 force = player.transform.up * forcePower;
-                tailBone.m_Force = force;
-            }
-            else
-            {
-                //Log("Tailbone not found?");
-            }
-        }
-
-        private IEnumerator JiggleRoutine()
-        {
-            while (true)
-            {
-                SetJiggleForce(1 * configuration.GetJiggleMultiplier());
-
-                yield return new WaitForEndOfFrame();
-
-                SetJiggleForce(0);
-
-                yield return new WaitForSeconds(.15f);
-            }
-        }
-
-        private void SetParticleEnabled(bool b) 
+        private void SetParticleEnabled(bool b)
         {
             ParticleSystem particle = GetParticleSystem();
 
@@ -377,82 +346,80 @@ namespace FartMod
             }
         }
 
-        private void SetEyeConditions()
+        protected virtual void SetEyeConditions(bool effectEnabled)
         {
             Player player = GetPlayer();
 
             if (!player)
                 return;
 
-            //Expression
-            //Set eye condition
-            player._pVisual._playerRaceModel.Set_EyeCondition(EyeCondition.Closed, 1f);
+            if (effectEnabled)
+            {
+                //Expression
+                //Set eye condition
+                player._pVisual._playerRaceModel.Set_EyeCondition(EyeCondition.Closed, 1f);
 
-            //Set eye condition
-            player._pVisual._playerRaceModel.Set_MouthCondition(MouthCondition.Closed, 1f);
+                //Set eye condition
+                player._pVisual._playerRaceModel.Set_MouthCondition(MouthCondition.Closed, 1f);
+            }
+            else 
+            {
+                //Expression
+                //Get eye condition
+                List<EyeCondition> eyeConditions = new List<EyeCondition>();
+                eyeConditions.Add(EyeCondition.Up);
+                eyeConditions.Add(EyeCondition.Closed);
+                EyeCondition eyeCond = eyeConditions[Random.Range(0, eyeConditions.Count)];
+                player._pVisual._playerRaceModel.Set_EyeCondition(eyeCond, 1f);
+
+                //Set eye condition
+                player._pVisual._playerRaceModel.Set_MouthCondition(MouthCondition.Open, 1f);
+            }
         }
 
         private IEnumerator EyeConditionRoutine()
         {
             while (true)
             {
-                SetEyeConditions();
+                SetEyeConditions(true);
                 yield return new WaitForEndOfFrame();
             }
         }
 
-        private void OnDisable() 
+        private void OnDisable()
         {
             SetEffectEnabled(false);
-
-            Player player = GetPlayer();
-
-            if (!player)
-                return;
-
-            //Expression
-            //Get eye condition
-            List<EyeCondition> eyeConditions = new List<EyeCondition>();
-            eyeConditions.Add(EyeCondition.Up);
-            eyeConditions.Add(EyeCondition.Closed);
-            EyeCondition eyeCond = eyeConditions[Random.Range(0, eyeConditions.Count)];
-            player._pVisual._playerRaceModel.Set_EyeCondition(eyeCond, 1f);
-
-            //Set eye condition
-            player._pVisual._playerRaceModel.Set_MouthCondition(MouthCondition.Open, 1f);
         }
     }
 
-    public class FartEffectsConfiguration
+    public class GasEffectsConfiguration
     {
-        public FartEffectsManager owner;
+        public GasEffectsManager owner;
         public float volume = 1;
         public string startColors;
         public string endColors;
         public float particleSize;
-        public float jiggleMultiplier = 1;
 
-        public FartEffectsConfiguration()
+        public GasEffectsConfiguration()
         {
             SetDefaults();
         }
 
-        public FartEffectsConfiguration(FartEffectsManager owner)
+        public GasEffectsConfiguration(GasEffectsManager owner)
         {
             this.owner = owner;
             SetDefaults();
         }
 
-        private void SetDefaults() 
+        protected virtual void SetDefaults()
         {
             volume = (float)Configuration.FartVolume.DefaultValue;
             startColors = (string)Configuration.FartParticleStartColors.DefaultValue;
             endColors = (string)Configuration.FartParticleEndColors.DefaultValue;
-            jiggleMultiplier = (float)Configuration.JiggleIntensity.DefaultValue;
             particleSize = (float)Configuration.FartParticleSize.DefaultValue;
         }
 
-        private bool IsPlayer() 
+        protected bool IsPlayer()
         {
             if (owner)
                 return owner.owner == Player._mainPlayer;
@@ -460,7 +427,7 @@ namespace FartMod
             return false;
         }
 
-        public float GetVolume() 
+        public virtual float GetVolume()
         {
             float volume = this.volume;
             if (IsPlayer())
@@ -469,31 +436,23 @@ namespace FartMod
             return volume + (Configuration.GlobalFartVolume.Value - 1);
         }
 
-        public float GetJiggleMultiplier()
+        public virtual List<Color> GetStartColors()
         {
             if (IsPlayer())
-                return Configuration.JiggleIntensity.Value;
-
-            return jiggleMultiplier;
-        }
-
-        public List<Color> GetStartColors()
-        {
-            if (IsPlayer())
-                return Configuration.GetStartColors();
+                return Configuration.GetStartColors(Configuration.FartParticleStartColors);
 
             return Configuration.GetColors(startColors);
         }
 
-        public List<Color> GetEndColors()
+        public virtual List<Color> GetEndColors()
         {
             if (IsPlayer())
-                return Configuration.GetEndColors();
+                return Configuration.GetEndColors(Configuration.FartParticleEndColors);
 
             return Configuration.GetColors(endColors);
         }
 
-        public float GetParticleSize()
+        public virtual float GetParticleSize()
         {
             if (IsPlayer())
                 return Configuration.FartParticleSize.Value;

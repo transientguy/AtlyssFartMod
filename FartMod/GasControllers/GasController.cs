@@ -1,5 +1,4 @@
-﻿using Mirror;
-using System;
+﻿using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
@@ -9,83 +8,24 @@ using UnityEngine;
 
 namespace FartMod
 {
-    public class FartController : MonoBehaviour
+    public class GasController : MonoBehaviour
     {
-        public static List<FartController> allFartControllers = new List<FartController>();
-        
         [Header("Components")]
         public Player owner;
-        private AssetBundle bundle;
+        protected AssetBundle bundle;
 
-        [Header("Fart Effects")]
-        private FartEffectsManager fartEffectsManager;
+        [Header("Gas Effects")]
+        protected GasEffectsManager fartEffectsManager;
 
         [Header("Animation Player")]
         private PlayableAnimationPlayer animPlayer;
 
-        public class CurrentAnimationMonitor 
-        {
-            public Animator animator;
-            public int layer;
-            public AnimationClip currentClip;
-            public List<AnimationClip> clipsToIgnore = new List<AnimationClip>();
-
-            public CurrentAnimationMonitor(Animator animator, int layer) 
-            {
-                this.animator = animator;
-                this.layer = layer;
-                currentClip = GetCurrentClip();
-            }
-
-            public AnimationClip GetCurrentClip() 
-            {
-                AnimatorClipInfo[] animatorInfo = this.animator.GetCurrentAnimatorClipInfo(layer);
-
-                if (animatorInfo.Any())
-                    return animatorInfo[0].clip;
-
-                return null;
-            }
-
-            public string Debug() 
-            {
-                string message = animator.GetLayerName(layer);
-
-                AnimationClip clip = GetCurrentClip();
-                if (clip)
-                    message += " " + clip.name;
-
-                return message;
-            }
-
-            public bool IsDifferent() 
-            {
-                AnimationClip clip = GetCurrentClip();
-
-                if (clipsToIgnore.Contains(clip))
-                    return false;
-
-                return currentClip != clip;
-            }
-        }
-
-        private void Awake()
-        {
-            if(!allFartControllers.Contains(this))
-                allFartControllers.Add(this);
-        }
-
-        private void OnDestroy() 
-        {
-            allFartControllers.Remove(this);
-        }
-
-        private void Log(string message, bool force = false) 
+        private void Log(string message, bool force = false)
         {
             FartModCore.Log(message, force);
         }
 
-        private AnimationClip GetAnimationClip(int index)
+        protected AnimationClip GetAnimationClip(int index)
         {
             Player player = GetPlayer();
             if (player)
@@ -126,7 +66,7 @@ namespace FartMod
             GetAnimationPlayer().enabled = false;
         }
 
-        private Animator GetPlayerAnimator() 
+        private Animator GetPlayerAnimator()
         {
             if (GetPlayer())
                 return GetPlayer()._pVisual._visualAnimator;
@@ -139,16 +79,16 @@ namespace FartMod
             Animator playerAnim = GetPlayerAnimator();
             List<CurrentAnimationMonitor> currentAnimationMonitors = new List<CurrentAnimationMonitor>();
 
-            if (GetPlayer()) 
+            if (GetPlayer())
             {
                 List<int> clipIndexes = new List<int>();
-                
+
                 //Alt idle clip
                 clipIndexes.Add(1);
 
                 List<AnimationClip> clipsToIgnore = new List<AnimationClip>();
 
-                foreach (int i in clipIndexes) 
+                foreach (int i in clipIndexes)
                 {
                     AnimationClip clip = GetAnimationClip(i);
                     if (clip)
@@ -157,7 +97,7 @@ namespace FartMod
 
                 playerAnim = GetPlayer()._pVisual._visualAnimator;
 
-                for (int i = 0; i < playerAnim.layerCount; i++) 
+                for (int i = 0; i < playerAnim.layerCount; i++)
                 {
                     //Ignore Weapon Hold Layer (2)
                     if (i == 2)
@@ -170,7 +110,7 @@ namespace FartMod
                     //Ignore Shield Hold Layer (4)
                     if (i == 4)
                         continue;
-                    
+
                     CurrentAnimationMonitor animationMonitor = new CurrentAnimationMonitor(playerAnim, i);
                     animationMonitor.clipsToIgnore = clipsToIgnore;
                     currentAnimationMonitors.Add(animationMonitor);
@@ -185,7 +125,7 @@ namespace FartMod
                     break;
                 }
 
-                if (!currentAnimationMonitors.Any()) 
+                if (!currentAnimationMonitors.Any())
                 {
                     Log("No monitors");
                     StopFartLoop();
@@ -221,11 +161,11 @@ namespace FartMod
             GetFartEffectsManager().StartEffect();
         }
 
-        private FartEffectsManager GetFartEffectsManager()
+        protected virtual GasEffectsManager GetFartEffectsManager()
         {
             if (!fartEffectsManager)
             {
-                fartEffectsManager = AddAndGetComponent<FartEffectsManager>(gameObject);
+                fartEffectsManager = AddAndGetComponent<GasEffectsManager>(gameObject);
                 fartEffectsManager.owner = GetPlayer();
                 fartEffectsManager.Initialize(bundle);
             }
@@ -244,7 +184,7 @@ namespace FartMod
             return animPlayer;
         }
 
-        private Player GetPlayer()
+        protected Player GetPlayer()
         {
             return owner;
         }
@@ -267,7 +207,7 @@ namespace FartMod
             }
         }
 
-        private void PlayAnimation()
+        protected virtual void PlayAnimation()
         {
             List<AnimationSequence> animationSequences = new List<AnimationSequence>();
 
@@ -282,14 +222,7 @@ namespace FartMod
             PlayAnimation(animationSequences);
         }
 
-        private void PlayAnimation(AnimationClip clip)
-        {
-            List<AnimationSequence> animationSequences = new List<AnimationSequence>();
-            animationSequences.Add(new AnimationSequence(clip, false));
-            PlayAnimation(animationSequences);
-        }
-
-        private void PlayAnimation(List<AnimationSequence> clips)
+        protected void PlayAnimation(List<AnimationSequence> clips)
         {
             if (!clips.Any())
             {
@@ -321,7 +254,7 @@ namespace FartMod
             Log("No character!");
         }
 
-        public void Initialize(AssetBundle bundle) 
+        public void Initialize(AssetBundle bundle)
         {
             this.bundle = bundle;
             GetFartEffectsManager();
@@ -348,7 +281,7 @@ namespace FartMod
                 transform.SetParent(owner.transform);
                 GetFartEffectsManager().SetTransform(transform);
             }
-            
+
             Initialize(bundle);
         }
     }

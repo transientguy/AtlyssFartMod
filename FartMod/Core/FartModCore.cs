@@ -9,6 +9,8 @@ using HarmonyLib;
 using System;
 using Mirror;
 using BepInEx.Configuration;
+using FartMod.GasControllers.Burps;
+using FartMod.Core.GasCommandManagers;
 
 namespace FartMod
 {
@@ -19,7 +21,8 @@ namespace FartMod
         internal static ConfigFile GetConfig() => instance.Config;
 
         public static FartModCore instance;
-        private FartController originalFartController;
+        private FartCommandManager fartCommands = new FartCommandManager();
+        private BurpCommandManager burpCommands = new BurpCommandManager();
         private AssetBundle bundle;
 
         public static void Log(string message, bool forcePlay = false)
@@ -44,29 +47,17 @@ namespace FartMod
                 throw;
             }
 
-            GetOriginalFartController();
+            fartCommands.Initialize();
+            burpCommands.Initialize();
             InitCommands();
+
             Log("Fart Mod Initialized!", true);
         }
 
         private void InitCommands()
         {
-            FartCommands.AddCommand("fart", "Rippin ass!", FartLoop);
-            FartCommands.AddCommand("fartoneshot", "Rippin ass!", FartOneshot);
-
-            FartCommands.AddCommand("fartinfinite", "Rippin ass!", FartLoopInfinite);
-            FartCommands.AddCommand("stopfarting", "", StopFarting);
-
             FartCommands.AddHostCommand("rebind", "", Rebind);
-
-            FartCommands.AddHostCommand("fartchaos", "", ToggleFartChaos);
-
-            FartCommands.AddHostCommand("fartvolume", "", SetFartVolume);
-            FartCommands.AddHostCommand("globalfartvolume", "", SetGlobalFartVolume);
-            FartCommands.AddHostCommand("fartsize", "", SetFarticleSize);
-            FartCommands.AddHostCommand("fartjiggle", "", SetFartJiggle);
-
-            Log("Fart Commands loaded");
+            FartCommands.AddHostCommand("allAnims", "", AllAnims);
         }
 
         private void Rebind(ChatBehaviour chatBehaviour, List<string> parameters) 
@@ -75,68 +66,7 @@ namespace FartMod
             GetConfig().Reload();
         }
 
-        private void ToggleFartChaos(ChatBehaviour chatBehaviour, List<string> parameters)
-        {
-            Configuration.FartChaos.Value = !Configuration.FartChaos.Value;
-            string onMessage = Configuration.FartChaos.Value ? "on" : "off";
-            Log("Fart chaos " + onMessage + "!");
-        }
-
-        private float GetFloat(List<string> parameters, int index, float defaultValue, out bool success) 
-        {
-            if (index >= parameters.Count) 
-            {
-                Log("Not enough parameters given for command");
-                success = false;
-                return defaultValue;
-            }
-
-            if (float.TryParse(parameters[index], out float value))
-            {
-                success = true;
-                return value;
-            }
-            else 
-            {
-                Log("Given parameter " + parameters[index] + " is of incorrect type");
-                success = false;
-                return defaultValue;
-            }
-        }
-
-        private void SetFartVolume(ChatBehaviour chatBehaviour, List<string> parameters)
-        {
-            Configuration.FartVolume.Value = GetFloat(parameters, 0, Configuration.FartVolume.Value, out bool b);
-
-            if (b)
-                Log("Set fart volume to " + Configuration.FartVolume.Value + "!");
-        }
-
-        private void SetGlobalFartVolume(ChatBehaviour chatBehaviour, List<string> parameters)
-        {
-            Configuration.GlobalFartVolume.Value = GetFloat(parameters, 0, Configuration.FartVolume.Value, out bool b);
-
-            if (b)
-                Log("Set global fart volume to " + Configuration.GlobalFartVolume.Value + "!");
-        }
-
-        private void SetFarticleSize(ChatBehaviour chatBehaviour, List<string> parameters)
-        {
-            Configuration.FartParticleSize.Value = GetFloat(parameters, 0, Configuration.FartVolume.Value, out bool b);
-
-            if (b)
-                Log("Set fart particle size to " + Configuration.FartParticleSize.Value + "!");
-        }
-
-        private void SetFartJiggle(ChatBehaviour chatBehaviour, List<string> parameters)
-        {
-            Configuration.JiggleIntensity.Value = GetFloat(parameters, 0, Configuration.FartVolume.Value, out bool b);
-
-            if (b)
-                Log("Set fart jiggle intensity to " + Configuration.JiggleIntensity.Value + "!");
-        }
-
-        private void AllAnims(ChatBehaviour chatBehaviour)
+        private void AllAnims(ChatBehaviour chatBehaviour, List<string> parameters)
         {
             Player player = Player._mainPlayer;
             if (player)
@@ -153,72 +83,7 @@ namespace FartMod
             }
         }
 
-        private void FartLoop(ChatBehaviour chatBehaviour, List<string> parameters) 
-        {
-            FartController controller = GetCharacterFartController(chatBehaviour);
-
-            if (controller)
-                controller.FartLoop();
-        }
-
-        private void FartOneshot(ChatBehaviour chatBehaviour, List<string> parameters)
-        {
-            FartController controller = GetCharacterFartController(chatBehaviour);
-
-            if (controller)
-                controller.FartOneshot();
-        }
-
-        private void FartLoopInfinite(ChatBehaviour chatBehaviour, List<string> parameters)
-        {
-            FartController controller = GetCharacterFartController(chatBehaviour);
-
-            if (controller)
-                controller.FartLoopInfinite();
-        }
-
-        private void StopFarting(ChatBehaviour chatBehaviour, List<string> parameters)
-        {
-            FartController controller = GetCharacterFartController(chatBehaviour);
-
-            if (controller)
-                controller.StopFarting();
-        }
-
-        private FartController GetCharacterFartController(ChatBehaviour chatBehaviour) 
-        {
-            Player owningPlayer = chatBehaviour.GetComponent<Player>();
-            if (owningPlayer) 
-            {
-                FartController controller = FartController.allFartControllers.Find(x => x.owner == owningPlayer);
-                if (!controller) 
-                {
-                    controller = Instantiate(GetOriginalFartController());
-                    controller.gameObject.SetActive(true);
-                    controller.SetOwner(owningPlayer, GetAssetBundle());
-                }
-
-                return controller;
-            }
-
-            return null;
-        }
-
-        private FartController GetOriginalFartController()
-        {
-            if (!originalFartController)
-            {
-                GameObject g = new GameObject("FartController");
-                g.transform.SetParent(transform);
-                originalFartController = g.AddComponent<FartController>();
-                originalFartController.Initialize(GetAssetBundle());
-                originalFartController.gameObject.SetActive(false);
-            }
-
-            return originalFartController;
-        }
-
-        private AssetBundle GetAssetBundle()
+        public AssetBundle GetAssetBundle()
         {
             if (!bundle) 
             {
@@ -342,8 +207,16 @@ namespace FartMod
                             bool command = CheckRPCCommandReceived(chat, _message);
 
                             //For farting chaos fun!
-                            if (Configuration.FartChaos.Value && !command && chat != playerChat)
-                                instance.FartLoop(chat, new List<string>());
+                            if (!command && chat != playerChat) 
+                            {
+                                bool all = false;
+
+                                if(Configuration.FartChaos.Value || all)
+                                    instance.fartCommands.GasLoop(chat, new List<string>());
+
+                                if (Configuration.BurpChaos.Value || all)
+                                    instance.burpCommands.GasLoop(chat, new List<string>());
+                            }
                         }
                     }
                 }

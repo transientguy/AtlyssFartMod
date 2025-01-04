@@ -86,13 +86,21 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="AssetUtils.cs" />
-    <Compile Include="Configuration.cs" />
-    <Compile Include="FartController.cs" />
-    <Compile Include="FartEffectsManager.cs" />
-    <Compile Include="FartModCore.cs" />
-    <Compile Include="PlayableAnimationPlayer.cs" />
+    <Compile Include="Core\AssetUtils.cs" />
+    <Compile Include="Core\Configuration.cs" />
+    <Compile Include="Core\GasCommandManagers\BurpCommandManager.cs" />
+    <Compile Include="Core\GasCommandManagers\FartCommandManager.cs" />
+    <Compile Include="Core\GasCommandManagers\GasCommandManager.cs" />
+    <Compile Include="GasControllers\Burps\BurpController.cs" />
+    <Compile Include="GasControllers\Burps\BurpEffectsManager.cs" />
+    <Compile Include="GasControllers\Farts\FartController.cs" />
+    <Compile Include="GasControllers\Farts\FartEffectsManager.cs" />
+    <Compile Include="Core\FartModCore.cs" />
+    <Compile Include="Core\PlayableAnimationPlayer.cs" />
+    <Compile Include="GasControllers\GasController.cs" />
+    <Compile Include="GasControllers\GasEffectsManager.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>
