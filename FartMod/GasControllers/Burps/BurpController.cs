@@ -48,5 +48,10 @@ namespace FartMod.GasControllers.Burps
 
             PlayAnimation(animationSequences);
         }
+
+        public override void FartLoop()
+        {
+            FartOneshot();
+        }
     }
 }

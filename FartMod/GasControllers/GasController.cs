@@ -45,7 +45,7 @@ namespace FartMod
             Fart();
         }
 
-        public void FartLoop()
+        public virtual void FartLoop()
         {
             PlayAnimation();
             StartCoroutine(LoopFartRoutine());
