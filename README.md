@@ -8,7 +8,7 @@ BepInEx 5
 1. Install Bepinex 5: https://thunderstore.io/c/lethal-company/p/BepInEx/BepInExPack/ 
 2. Extract FartMod folder in ATLYSS\BepInEx\plugins
 
-### Commands
+### Fart Commands
 
 /fart - starts fart emote loop
 
@@ -30,7 +30,27 @@ BepInEx 5
 
 /fartchaos - toggle fart chaos effect which makes all multiplayer characters fart when they chat
 
+### Burp Commands
+
+/burp - does simple oneshot burp (Could be changed to an animation but is just a oneshot for now)
+
+/burponeshot - does simple oneshot burp
+
+/burpinfinite - starts an infinite loop of burping
+
+/stopburping - stops the infinite loop of burping
+
+/burpvolume - sets player fart volume i.e: /burpvolume 0.025
+
+/globalburpvolume - sets global fart volume i.e: /globalburpvolume 1
+
+/burpsize - sets burp particle size i.e: /burpsize .5
+
+/burpchaos - toggle burp chaos effect which makes all multiplayer characters burp when they chat
+
 ### Config File
+
+### Farts
 
 Config file located: ATLYSS\BepInEx\config\TransientGuy.Atlyss.FartMod.cfg
 
@@ -47,4 +67,18 @@ FartParticleEndColors: Hexedecimal list of colors for the fart particle's end gr
 FartChaos: Experimental mode that makes all multiplayer character's fart when they chat
 
 GlobalFartVolume: Volume of all character farts
+
+### Burps
+
+BurpVolume: volume of player character's burps
+
+BurpParticleSize: Size of player character's burp particles
+
+BurpParticleStartColors: Hexedecimal list of colors for the burp particle's start gradient (only supports up to 3)
+
+BurpParticleEndColors: Hexedecimal list of colors for the burp particle's end gradient (only supports up to 3)
+
+BurpChaos: Experimental mode that makes all multiplayer character's burp when they chat
+
+GlobalBurpVolume: Volume of all character burps
 
