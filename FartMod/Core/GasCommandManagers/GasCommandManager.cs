@@ -1,5 +1,6 @@
 ﻿using BepInEx.Configuration;
 using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -59,7 +60,7 @@ namespace FartMod.Core.GasCommandManagers
             return sounds;
         }
 
-        protected virtual string GetGasVerb() 
+        protected virtual string GetGasVerb()
         {
             return "fart";
         }
@@ -80,22 +81,30 @@ namespace FartMod.Core.GasCommandManagers
             FartCommands.AddHostCommand("global" + verb + "volume", "", SetGlobalGasVolume);
             FartCommands.AddHostCommand(verb + "size", "", SetGasParticleSize);
 
+            //NPCs
+            string npcStr = "npc";
+            FartCommands.AddCommand(npcStr + verb, "", NPCGasLoopInfinite);
+            FartCommands.AddCommand(npcStr + "stop" + verb + "ing", "", NPCStopGas);
+
+            string targetStr = "target";
+            FartCommands.AddCommand(targetStr + verb, "", TargetGasLoopInfinite);
+            FartCommands.AddCommand(targetStr + "stop" + verb + "ing", "", TargetStopGas);
+
             GetOriginalGasController();
             GetAudioClips();
             Log(GetGasVerbUpper() + " Commands loaded");
         }
 
-        protected virtual GasController GetCharacterGasController(ChatBehaviour chatBehaviour)
+        protected virtual GasController GetCharacterGasController(Component owningObject)
         {
-            Player owningPlayer = chatBehaviour.GetComponent<Player>();
-            if (owningPlayer)
+            if (owningObject)
             {
-                GasController controller = FartController.allFartControllers.Find(x => x.CompareOwner(owningPlayer));
+                GasController controller = FartController.allFartControllers.Find(x => x.CompareOwner(owningObject));
                 if (!controller)
                 {
                     controller = GameObject.Instantiate(GetOriginalGasController());
                     controller.gameObject.SetActive(true);
-                    controller.SetOwner(owningPlayer, FartModCore.instance.GetAssetBundle());
+                    controller.SetOwner(owningObject, FartModCore.instance.GetAssetBundle());
                 }
 
                 return controller;
@@ -104,7 +113,7 @@ namespace FartMod.Core.GasCommandManagers
             return null;
         }
 
-        protected virtual ConfigEntry<bool> GetChaosConfig() 
+        protected virtual ConfigEntry<bool> GetChaosConfig()
         {
             return Configuration.FartChaos;
         }
@@ -155,10 +164,10 @@ namespace FartMod.Core.GasCommandManagers
                 Log("Set " + GetGasVerb() + " particle size to " + GetParticleSizeConfig().Value + "!");
         }
 
-        private string GetGasVerbUpper() 
+        private string GetGasVerbUpper()
         {
             string str = GetGasVerb();
-            
+
             if (str.Length == 1)
             {
                 char.ToUpper(str[0]);
@@ -193,36 +202,72 @@ namespace FartMod.Core.GasCommandManagers
             }
         }
 
-        public void GasLoop(ChatBehaviour chatBehaviour, List<string> parameters)
+        public void GasLoop(Component owningObject, List<string> parameters)
         {
-            GasController controller = GetCharacterGasController(chatBehaviour);
+            GasController controller = GetCharacterGasController(owningObject);
 
             if (controller)
                 controller.FartLoop();
         }
 
-        private void GasOneshot(ChatBehaviour chatBehaviour, List<string> parameters)
+        private void GasOneshot(Component owningObject, List<string> parameters)
         {
-            GasController controller = GetCharacterGasController(chatBehaviour);
+            GasController controller = GetCharacterGasController(owningObject);
 
             if (controller)
                 controller.FartOneshot();
         }
 
-        private void GasLoopInfinite(ChatBehaviour chatBehaviour, List<string> parameters)
+        private void GasLoopInfinite(Component owningObject, List<string> parameters)
         {
-            GasController controller = GetCharacterGasController(chatBehaviour);
+            GasController controller = GetCharacterGasController(owningObject);
 
             if (controller)
                 controller.FartLoopInfinite();
         }
 
-        private void StopGas(ChatBehaviour chatBehaviour, List<string> parameters)
+        private void StopGas(Component owningObject, List<string> parameters)
         {
-            GasController controller = GetCharacterGasController(chatBehaviour);
+            GasController controller = GetCharacterGasController(owningObject);
 
             if (controller)
                 controller.StopFarting();
+        }
+
+        private void NPCGasLoopInfinite(Component owningObject, List<string> parameters)
+        {
+
+        }
+
+        private void NPCStopGas(Component owningObject, List<string> parameters)
+        {
+
+        }
+
+        public StatusEntity GetTarget(Component owningObject)
+        {
+            Player player = owningObject.GetComponent<Player>();
+
+            if (player)
+                return player._pTargeting._foundEntity;
+
+            return null;
+        }
+
+        private void TargetGasLoopInfinite(Component owningObject, List<string> parameters)
+        {
+            StatusEntity target = GetTarget(owningObject);
+
+            if (target)
+                GasLoopInfinite(target, parameters);
+        }
+
+        private void TargetStopGas(Component owningObject, List<string> parameters)
+        {
+            StatusEntity target = GetTarget(owningObject);
+
+            if (target)
+                GasLoopInfinite(target, parameters);
         }
 
         protected GasController GetOriginalGasController()

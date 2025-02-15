@@ -7,95 +7,13 @@ using UnityEngine;
 
 namespace FartMod
 {
-    public class GasCharacterModel
-    {
-        public GameObject owningObject;
-
-        public GasCharacterModel(Component owningObject)
-        {
-            this.owningObject = owningObject.gameObject;
-        }
-
-        public bool IsValid()
-        {
-            return owningObject;
-        }
-
-        public virtual Animator GetAnimator() 
-        {
-            return null;
-        }
-
-        public virtual Animator GetRaceAnimator() 
-        {
-            return null;
-        }
-
-        public virtual Transform GetTransform()
-        {
-            return owningObject.transform;
-        }
-
-        public virtual Transform GetHeadTransform()
-        {
-            return owningObject.transform;
-        }
-
-        public virtual Vector3 AssDirection()
-        {
-            return -owningObject.transform.forward;
-        }
-
-        public virtual Vector3 AssPosition()
-        {
-            return owningObject.transform.position;
-        }
-
-        public virtual void SetEyeCondition(EyeCondition eyeCondition, float time)
-        {
-
-        }
-
-        public virtual void SetMouthCondition(MouthCondition mouthCondition, float time)
-        {
-
-        }
-
-        public virtual void JiggleAss(float forcePower)
-        {
-
-        }
-
-        public virtual void JiggleTail(float forcePower) 
-        {
-
-        }
-
-        public static implicit operator bool(GasCharacterModel model)
-        {
-            if (model == null)
-                return false;
-
-            return model.IsValid();
-        }
-
-        public static GasCharacterModel GetModelFromComponent(Component owningObject) 
-        {
-            if (owningObject is Player)
-                return new GasPlayerCharacterModel(owningObject);
-            
-            return new GasCharacterModel(owningObject);
-        }
-    }
-
     public class GasPlayerCharacterModel : GasCharacterModel
     {
         public Player player;
 
-        public GasPlayerCharacterModel(Component owningObject) : base (owningObject)
+        public override void Initialize(Component owningObject)
         {
-            if(owningObject is Player)
-                player = owningObject as Player;
+            player = owningObject as Player;
         }
 
         public override void SetEyeCondition(EyeCondition eyeCondition, float time)
@@ -130,12 +48,16 @@ namespace FartMod
 
         public override void JiggleAss(float forcePower)
         {
-            DynamicBone[] assBones = player._pVisual._playerRaceModel._assDynamicBones;
+            JiggleAssDynamicBones(player._pVisual._playerRaceModel._assDynamicBones, this, forcePower);
+        }
+
+        public static void JiggleAssDynamicBones(DynamicBone[] assBones, GasCharacterModel model, float forcePower)
+        {
             for (int i = 0; i < assBones.Length; i++)
             {
                 DynamicBone assBone = assBones[i];
                 float multiplier = ((i + 1) % 2) == 0 ? 1 : -1;
-                Vector3 force = GetTransform().right * multiplier * forcePower;
+                Vector3 force = model.GetTransform().right * multiplier * forcePower;
                 assBone.m_Force = force;
             }
         }

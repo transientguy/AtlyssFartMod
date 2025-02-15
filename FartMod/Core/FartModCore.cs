@@ -47,6 +47,7 @@ namespace FartMod
                 throw;
             }
 
+            GasCharacterModelTypes.GetCharacterModelTypes();
             fartCommands.Initialize();
             burpCommands.Initialize();
             InitCommands();
@@ -58,6 +59,12 @@ namespace FartMod
         {
             FartCommands.AddHostCommand("rebind", "", Rebind);
             FartCommands.AddHostCommand("allAnims", "", AllAnims);
+            FartCommands.AddHostCommand("updatemodels", "", UpdateModels);
+        }
+
+        private void UpdateModels(ChatBehaviour chatBehaviour, List<string> parameters) 
+        {
+            GasCharacterModelTypes.GetCharacterModelTypes();
         }
 
         private void Rebind(ChatBehaviour chatBehaviour, List<string> parameters) 

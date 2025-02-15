@@ -281,7 +281,14 @@ namespace FartMod
 
         public void SetOwner(Component owningObject, AssetBundle bundle)
         {
-            model = GasCharacterModel.GetModelFromComponent(owningObject);
+            if (!model)
+            {
+                model = GasCharacterModel.GetModelFromComponent(owningObject, gameObject);
+            }
+            else 
+            {
+                model.Initialize(owningObject);
+            }
 
             if (owningObject)
             {

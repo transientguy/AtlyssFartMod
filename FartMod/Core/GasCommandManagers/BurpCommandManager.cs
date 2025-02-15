@@ -25,17 +25,16 @@ namespace FartMod.Core.GasCommandManagers
             return "burp";
         }
 
-        protected override GasController GetCharacterGasController(ChatBehaviour chatBehaviour)
+        protected override GasController GetCharacterGasController(Component owningObject)
         {
-            Player owningPlayer = chatBehaviour.GetComponent<Player>();
-            if (owningPlayer)
+            if (owningObject)
             {
-                GasController controller = BurpController.allBurpControllers.Find(x => x.CompareOwner(owningPlayer));
+                GasController controller = BurpController.allBurpControllers.Find(x => x.CompareOwner(owningObject));
                 if (!controller)
                 {
                     controller = GameObject.Instantiate(GetOriginalGasController());
                     controller.gameObject.SetActive(true);
-                    controller.SetOwner(owningPlayer, FartModCore.instance.GetAssetBundle());
+                    controller.SetOwner(owningObject, FartModCore.instance.GetAssetBundle());
                 }
 
                 return controller;
