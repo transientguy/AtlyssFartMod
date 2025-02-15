@@ -1,8 +1,7 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
+using System.IO;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+using System.Reflection;
 using UnityEngine;
 using UnityEngine.Events;
 
@@ -17,21 +16,115 @@ namespace FartMod
         {
             characterModelTypes.Clear();
 
-
+            string path = Path.Combine(Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location), "Models");
+            if (Directory.Exists(path))
+            {
+                Log($"checking folder {Path.GetFileName(path)}");
+                string[] files = Directory.GetFiles(path);
+                foreach (string file in files)
+                {
+                    BoneStructureGasCharacterModelType newModelType = new BoneStructureGasCharacterModelType();
+                    newModelType.SetInfo(file);
+                    characterModelTypes.Add(newModelType);
+                }
+            }
+            else
+            {
+                Log($"Directory {path} does not exist! Creating.");
+                Directory.CreateDirectory(path);
+            }
 
             onModelTypesUpdated.Invoke();
         }
 
-        public static GasCharacterModelType GetModelType(Animator animator) 
+        private static void Log(string message)
         {
-            return new GasCharacterModelType();
+            FartModCore.Log(message);
+        }
+
+        public static GasCharacterModelType GetModelType(SimpleAnimatorGasCharacterModel model) 
+        {
+            return characterModelTypes.Find(x => x.IsMatch(model));
+        }
+    }
+
+    public class BoneStructureGasCharacterModelType : GasCharacterModelType
+    {
+        public List<string> boneStructure = new List<string>();
+
+        public void SetInfo(string file) 
+        {
+            Dictionary<string, List<string>> data = AssetUtils.GetParameterDictionaryFromFile(file);
+
+            string bonesKey = "Bones";
+            if (data.ContainsKey(bonesKey)) 
+            {
+                boneStructure = data[bonesKey];
+            }
+
+            string headBoneKey = "HeadBone";
+            if (data.ContainsKey(headBoneKey))
+            {
+                if (data[headBoneKey].Any())
+                    headBone = data[headBoneKey][0];
+            }
+
+            string assBonesKey = "AssBones";
+            if (data.ContainsKey(assBonesKey))
+            {
+                assBones = data[assBonesKey];
+            }
+        }
+
+        public override bool IsMatch(SimpleAnimatorGasCharacterModel model)
+        {
+            if (model.skinnedMeshRenderers.Any()) 
+            {
+                SkinnedMeshRenderer smr = model.skinnedMeshRenderers[0];
+
+                for (int i = 0; i < boneStructure.Count; i++)
+                {
+                    if (i < smr.bones.Length)
+                    {
+                        if (boneStructure[i] != smr.bones[i].name)
+                            return false;
+                    }
+                    else 
+                    {
+                        return false;
+                    }
+                }
+                
+                return true;
+            }
+
+            return false;
         }
     }
 
     public class GasCharacterModelType
     {
-        public List<string> animators = new List<string>();
         public string headBone;
         public List<string> assBones = new List<string>();
+
+        public GasCharacterModelType() 
+        {
+
+        }
+
+        public virtual bool IsMatch(SimpleAnimatorGasCharacterModel model)
+        {
+            return false;
+        }
+
+        public virtual Transform GetHeadBone(SimpleAnimatorGasCharacterModel model) 
+        {
+            return null;
+        }
+
+        public virtual List<Transform> GetAssBones(SimpleAnimatorGasCharacterModel model)
+        {
+            return null;
+        }
     }
 }

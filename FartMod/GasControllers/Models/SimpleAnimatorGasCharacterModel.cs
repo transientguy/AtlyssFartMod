@@ -10,6 +10,7 @@ namespace FartMod
     public class SimpleAnimatorGasCharacterModel : GasCharacterModel
     {
         public Animator animator;
+        public List<SkinnedMeshRenderer> skinnedMeshRenderers = new List<SkinnedMeshRenderer>();
         public GasCharacterModelType modelType;
 
         public Transform headTransform;
@@ -24,11 +25,12 @@ namespace FartMod
 
         private void OnModelsUpdated() 
         {
-            modelType = GasCharacterModelTypes.GetModelType(animator);
+            modelType = GasCharacterModelTypes.GetModelType(this);
 
             if (modelType != null) 
             {
-
+                headTransform = modelType.GetHeadBone(this);
+                assBones = modelType.GetAssBones(this);
             }
         }
 
@@ -40,6 +42,7 @@ namespace FartMod
         public override void Initialize(Component owningObject)
         {
             animator = owningObject as Animator;
+            skinnedMeshRenderers = animator.GetComponentsInChildren<SkinnedMeshRenderer>().ToList();
             OnModelsUpdated();
         }
 

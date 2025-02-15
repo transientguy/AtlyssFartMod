@@ -48,6 +48,7 @@ namespace FartMod
             }
 
             GasCharacterModelTypes.GetCharacterModelTypes();
+            NPCIdentification.InitializeDictionary();
             fartCommands.Initialize();
             burpCommands.Initialize();
             InitCommands();

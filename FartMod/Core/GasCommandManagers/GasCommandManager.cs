@@ -236,12 +236,26 @@ namespace FartMod.Core.GasCommandManagers
 
         private void NPCGasLoopInfinite(Component owningObject, List<string> parameters)
         {
+            if (parameters.Any()) 
+            {
+                string NPCKey = parameters[0];
+                GameObject NPC = NPCIdentification.GetNPC(NPCKey);
 
+                if (NPC)
+                    GasLoopInfinite(NPC.transform, parameters);
+            }
         }
 
         private void NPCStopGas(Component owningObject, List<string> parameters)
         {
+            if (parameters.Any())
+            {
+                string NPCKey = parameters[0];
+                GameObject NPC = NPCIdentification.GetNPC(NPCKey);
 
+                if (NPC)
+                    NPCStopGas(NPC.transform, parameters);
+            }
         }
 
         public StatusEntity GetTarget(Component owningObject)
@@ -267,7 +281,7 @@ namespace FartMod.Core.GasCommandManagers
             StatusEntity target = GetTarget(owningObject);
 
             if (target)
-                GasLoopInfinite(target, parameters);
+                StopGas(target, parameters);
         }
 
         protected GasController GetOriginalGasController()

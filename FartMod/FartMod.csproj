@@ -97,9 +97,12 @@
     <Compile Include="GasControllers\Farts\FartEffectsManager.cs" />
     <Compile Include="Core\FartModCore.cs" />
     <Compile Include="Core\PlayableAnimationPlayer.cs" />
-    <Compile Include="GasControllers\GasCharacterModel.cs" />
+    <Compile Include="GasControllers\Models\GasCharacterModel.cs" />
     <Compile Include="GasControllers\GasController.cs" />
     <Compile Include="GasControllers\GasEffectsManager.cs" />
+    <Compile Include="GasControllers\Models\GasCharacterModelTypes.cs" />
+    <Compile Include="GasControllers\Models\GasPlayerCharacterModel.cs" />
+    <Compile Include="GasControllers\Models\SimpleAnimatorGasCharacterModel.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup />

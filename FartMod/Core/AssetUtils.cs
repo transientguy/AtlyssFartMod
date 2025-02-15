@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using System.Reflection;
 using UnityEngine;
 using UnityEngine.Networking;
@@ -130,6 +131,42 @@ namespace FartMod
             }
 
             return sounds;
+        }
+
+        public static List<string> GetAllLinesAtFile(string filePath) 
+        {
+            Log($"\tchecking single file {Path.GetFileName(filePath)}");
+            return File.ReadAllLines(filePath).ToList();
+        }
+
+        public static Dictionary<string, List<string>> GetParameterDictionaryFromFile(string filePath)
+        {
+            Dictionary<string, List<string>> dictionary = new Dictionary<string, List<string>>();
+            List<string> lines = GetAllLinesAtFile(filePath);
+
+            foreach(string str in lines) 
+            {
+                List<string> splitHeader = str.Split(':').ToList();
+
+                if (splitHeader.Count >= 2) 
+                {
+                    string key = splitHeader[0].Trim();
+
+                    if (!dictionary.ContainsKey(key))
+                        dictionary.Add(key, GetParametersFromLine(splitHeader[1]));
+                }
+            }
+            
+            return dictionary;
+        }
+
+        public static List<string> GetParametersFromLine(string line)
+        {
+            string[] parameters = line.Split(',');
+            for (int i = 0; i < parameters.Length; i++)
+                parameters[i] = parameters[i].Trim();
+
+            return parameters.ToList();
         }
     }
 }
