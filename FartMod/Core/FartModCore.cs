@@ -21,8 +21,8 @@ namespace FartMod
         internal static ConfigFile GetConfig() => instance.Config;
 
         public static FartModCore instance;
-        private FartCommandManager fartCommands = new FartCommandManager();
-        private BurpCommandManager burpCommands = new BurpCommandManager();
+        public FartCommandManager fartCommands = new FartCommandManager();
+        public BurpCommandManager burpCommands = new BurpCommandManager();
         private AssetBundle bundle;
 
         public static void Log(string message, bool forcePlay = false)

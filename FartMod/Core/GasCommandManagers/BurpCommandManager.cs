@@ -12,6 +12,14 @@ namespace FartMod.Core.GasCommandManagers
 {
     public class BurpCommandManager : GasCommandManager<BurpController>
     {
+        public override List<AudioClip> GetAudioClips()
+        {
+            if (!sounds.Any())
+                sounds = CollectAudioFilesFromPath("Burp Audio");
+            
+            return sounds;
+        }
+
         protected override string GetGasVerb()
         {
             return "burp";
@@ -22,7 +30,7 @@ namespace FartMod.Core.GasCommandManagers
             Player owningPlayer = chatBehaviour.GetComponent<Player>();
             if (owningPlayer)
             {
-                GasController controller = BurpController.allBurpControllers.Find(x => x.owner == owningPlayer);
+                GasController controller = BurpController.allBurpControllers.Find(x => x.CompareOwner(owningPlayer));
                 if (!controller)
                 {
                     controller = GameObject.Instantiate(GetOriginalGasController());

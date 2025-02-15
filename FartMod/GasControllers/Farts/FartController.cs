@@ -29,7 +29,7 @@ namespace FartMod
             if (!fartEffectsManager)
             {
                 fartEffectsManager = AddAndGetComponent<FartEffectsManager>(gameObject);
-                fartEffectsManager.owner = GetPlayer();
+                fartEffectsManager.model = GetModel();
                 fartEffectsManager.Initialize(bundle);
             }
 

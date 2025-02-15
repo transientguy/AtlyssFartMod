@@ -1,7 +1,9 @@
 ﻿using BepInEx.Configuration;
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
+using System.Reflection;
 using System.Text;
 using System.Threading.Tasks;
 using UnityEngine;
@@ -12,6 +14,50 @@ namespace FartMod.Core.GasCommandManagers
     public class GasCommandManager<T> where T : GasController
     {
         private GasController originalFartController;
+        public List<AudioClip> sounds = new List<AudioClip>();
+
+        public virtual List<AudioClip> GetAudioClips()
+        {
+            return new List<AudioClip>();
+        }
+
+        protected List<AudioClip> CollectAudioFilesFromPath(string audioPathName)
+        {
+            List<AudioClip> sounds = new List<AudioClip>();
+
+            Log("Checking Sounds");
+
+            string path = Path.Combine(Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location), audioPathName);
+            if (Directory.Exists(path))
+            {
+                sounds = CollectAudioFiles(path);
+            }
+            else
+            {
+                Log($"Directory {path} does not exist! Creating.");
+                Directory.CreateDirectory(path);
+            }
+
+            return sounds;
+        }
+
+        private List<AudioClip> CollectAudioFiles(string path)
+        {
+            List<AudioClip> sounds = new List<AudioClip>();
+
+            Log($"checking folder {Path.GetFileName(path)}");
+            string[] audioFiles = Directory.GetFiles(path, "*.*", SearchOption.AllDirectories);
+            foreach (string file in audioFiles)
+            {
+                Log($"\tchecking single file {Path.GetFileName(file)}");
+                AudioClip clip = AssetUtils.LoadAudioFromWebRequest(file, AudioType.UNKNOWN);
+
+                if (clip)
+                    sounds.Add(clip);
+            }
+
+            return sounds;
+        }
 
         protected virtual string GetGasVerb() 
         {
@@ -35,6 +81,7 @@ namespace FartMod.Core.GasCommandManagers
             FartCommands.AddHostCommand(verb + "size", "", SetGasParticleSize);
 
             GetOriginalGasController();
+            GetAudioClips();
             Log(GetGasVerbUpper() + " Commands loaded");
         }
 
@@ -43,7 +90,7 @@ namespace FartMod.Core.GasCommandManagers
             Player owningPlayer = chatBehaviour.GetComponent<Player>();
             if (owningPlayer)
             {
-                GasController controller = FartController.allFartControllers.Find(x => x.owner == owningPlayer);
+                GasController controller = FartController.allFartControllers.Find(x => x.CompareOwner(owningPlayer));
                 if (!controller)
                 {
                     controller = GameObject.Instantiate(GetOriginalGasController());

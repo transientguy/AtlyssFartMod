@@ -10,6 +10,14 @@ namespace FartMod.Core.GasCommandManagers
 {
     public class FartCommandManager : GasCommandManager<FartController>
     {
+        public override List<AudioClip> GetAudioClips()
+        {
+            if (!sounds.Any())
+                sounds = CollectAudioFilesFromPath("Audio");
+
+            return sounds;
+        }
+
         public override void Initialize()
         {
             FartCommands.AddHostCommand(GetGasVerb() + "jiggle", "", SetFartJiggle);

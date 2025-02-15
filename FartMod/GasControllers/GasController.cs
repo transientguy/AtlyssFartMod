@@ -11,7 +11,7 @@ namespace FartMod
     public class GasController : MonoBehaviour
     {
         [Header("Components")]
-        public Player owner;
+        public GasCharacterModel model;
         protected AssetBundle bundle;
 
         [Header("Gas Effects")]
@@ -27,10 +27,10 @@ namespace FartMod
 
         protected AnimationClip GetAnimationClip(int index)
         {
-            Player player = GetPlayer();
-            if (player)
+            GasCharacterModel model = GetModel();
+            if (model)
             {
-                Animator animator = player._pVisual._playerRaceModel._raceAnimator;
+                Animator animator = model.GetRaceAnimator();
 
                 if (index < animator.runtimeAnimatorController.animationClips.Length)
                     return animator.runtimeAnimatorController.animationClips[index];
@@ -68,8 +68,8 @@ namespace FartMod
 
         private Animator GetPlayerAnimator()
         {
-            if (GetPlayer())
-                return GetPlayer()._pVisual._visualAnimator;
+            if (GetModel())
+                return GetModel().GetAnimator();
 
             return null;
         }
@@ -79,7 +79,7 @@ namespace FartMod
             Animator playerAnim = GetPlayerAnimator();
             List<CurrentAnimationMonitor> currentAnimationMonitors = new List<CurrentAnimationMonitor>();
 
-            if (GetPlayer())
+            if (GetModel())
             {
                 List<int> clipIndexes = new List<int>();
 
@@ -95,7 +95,7 @@ namespace FartMod
                         clipsToIgnore.Add(clip);
                 }
 
-                playerAnim = GetPlayer()._pVisual._visualAnimator;
+                playerAnim = GetModel().GetAnimator();
 
                 for (int i = 0; i < playerAnim.layerCount; i++)
                 {
@@ -119,7 +119,7 @@ namespace FartMod
 
             while (true)
             {
-                if (!GetPlayer())
+                if (!GetModel())
                 {
                     StopFartLoop();
                     break;
@@ -166,7 +166,7 @@ namespace FartMod
             if (!fartEffectsManager)
             {
                 fartEffectsManager = AddAndGetComponent<GasEffectsManager>(gameObject);
-                fartEffectsManager.owner = GetPlayer();
+                fartEffectsManager.model = GetModel();
                 fartEffectsManager.Initialize(bundle);
             }
 
@@ -184,9 +184,9 @@ namespace FartMod
             return animPlayer;
         }
 
-        protected Player GetPlayer()
+        protected GasCharacterModel GetModel()
         {
-            return owner;
+            return model;
         }
 
         private IEnumerator FartLoopInfiniteRoutine()
@@ -195,7 +195,7 @@ namespace FartMod
 
             while (true)
             {
-                if (!GetPlayer())
+                if (!GetModel())
                 {
                     StopAllCoroutines();
                     break;
@@ -230,11 +230,11 @@ namespace FartMod
                 return;
             }
 
-            Player player = GetPlayer();
+            GasCharacterModel model = GetModel();
 
-            if (player)
+            if (model)
             {
-                Animator playerAnim = player._pVisual._visualAnimator;
+                Animator playerAnim = model.GetAnimator();
 
                 if (playerAnim)
                 {
@@ -271,14 +271,19 @@ namespace FartMod
             return final;
         }
 
-        public void SetOwner(Player owner, AssetBundle bundle)
+        public bool CompareOwner(Component owningObject) 
         {
-            this.owner = owner;
+            return model.owningObject == owningObject;
+        }
 
-            if (owner)
+        public void SetOwner(Component owningObject, AssetBundle bundle)
+        {
+            model = GasCharacterModel.GetModelFromComponent(owningObject);
+
+            if (owningObject)
             {
-                name += " " + owner.name;
-                transform.SetParent(owner.transform);
+                name += " " + owningObject.name;
+                transform.SetParent(owningObject.transform);
                 GetFartEffectsManager().SetTransform(transform);
             }
 

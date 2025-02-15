@@ -5,19 +5,15 @@ using System.IO;
 using System.Collections;
 using System.Linq;
 using static UnityEngine.ParticleSystem;
+using FartMod.Core.GasCommandManagers;
 
 namespace FartMod
 {
     public class FartEffectsManager : GasEffectsManager
     {
-        private static List<AudioClip> sounds = new List<AudioClip>();
-
         protected override List<AudioClip> GetAudioClips()
         {
-            if (!sounds.Any())
-                sounds = CollectAudioFilesFromPath("Audio");
-
-            return sounds;
+            return FartModCore.instance.fartCommands.GetAudioClips();
         }
 
         protected override GasEffectsConfiguration GetGasEffectsConfiguration()
@@ -25,32 +21,14 @@ namespace FartMod
             return new FartEffectsConfiguration(this);
         }
 
-        protected override Vector3 EffectDirection(Player player)
+        protected override Vector3 EffectDirection(GasCharacterModel model)
         {
-            Vector3 averagePosition = Vector3.zero;
-
-            DynamicBone[] assBones = player._pVisual._playerRaceModel._assDynamicBones;
-            for (int i = 0; i < assBones.Length; i++)
-            {
-                DynamicBone assBone = assBones[i];
-                averagePosition += assBone.m_Root.up;
-            }
-
-            return (averagePosition / assBones.Length);
+            return base.EffectDirection(model);
         }
 
-        protected override Vector3 EffectPosition(Player player)
+        protected override Vector3 EffectPosition(GasCharacterModel model)
         {
-            Vector3 averagePosition = Vector3.zero;
-
-            DynamicBone[] assBones = player._pVisual._playerRaceModel._assDynamicBones;
-            for (int i = 0; i < assBones.Length; i++)
-            {
-                DynamicBone assBone = assBones[i];
-                averagePosition += assBone.transform.position;
-            }
-
-            return (averagePosition / assBones.Length);
+            return base.EffectPosition(model);
         }
 
         protected override void SetEffectEnabled(bool b) 
@@ -65,9 +43,9 @@ namespace FartMod
 
         private void SetJiggleForce(float forceMultiplier) 
         {
-            Player player = GetPlayer();
+            GasCharacterModel model = GetModel();
 
-            if (!player)
+            if (!model)
                 return;
 
             //Jiggle dynamic bones
@@ -75,28 +53,10 @@ namespace FartMod
             float forcePower = randPower * forceMultiplier;
 
             //Jiggle dat ass
-            DynamicBone[] assBones = player._pVisual._playerRaceModel._assDynamicBones;
-            for (int i = 0; i < assBones.Length; i++)
-            {
-                DynamicBone assBone = assBones[i];
-                float multiplier = ((i + 1) % 2) == 0 ? 1 : -1;
-                Vector3 force = player.transform.right * multiplier * forcePower;
-                assBone.m_Force = force;
-            }
+            model.JiggleAss(forcePower);
 
             //Jiggle tail
-            List<DynamicBone> dynamicBones = new List<DynamicBone>(player.gameObject.GetComponentsInChildren<DynamicBone>());
-            DynamicBone tailBone = dynamicBones.Find(x => x.name.Contains("tail"));
-
-            if (tailBone)
-            {
-                Vector3 force = player.transform.up * forcePower;
-                tailBone.m_Force = force;
-            }
-            else
-            {
-                //Log("Tailbone not found?");
-            }
+            model.JiggleTail(forcePower);
         }
 
         private IEnumerator JiggleRoutine()

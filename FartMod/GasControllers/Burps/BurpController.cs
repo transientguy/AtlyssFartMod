@@ -27,7 +27,7 @@ namespace FartMod.GasControllers.Burps
             if (!fartEffectsManager)
             {
                 fartEffectsManager = AddAndGetComponent<BurpEffectsManager>(gameObject);
-                fartEffectsManager.owner = GetPlayer();
+                fartEffectsManager.model = GetModel();
                 fartEffectsManager.Initialize(bundle);
             }
 

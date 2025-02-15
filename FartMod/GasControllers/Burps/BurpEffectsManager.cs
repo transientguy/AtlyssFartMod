@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using FartMod.Core.GasCommandManagers;
+using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -8,8 +9,6 @@ namespace FartMod.GasControllers.Burps
 {
     public class BurpEffectsManager : GasEffectsManager
     {
-        private static List<AudioClip> sounds = new List<AudioClip>();
-
         protected override GasEffectsConfiguration GetGasEffectsConfiguration()
         {
             return new BurpEffectsConfiguration(this);
@@ -17,40 +16,37 @@ namespace FartMod.GasControllers.Burps
 
         protected override List<AudioClip> GetAudioClips()
         {
-            if (!sounds.Any())
-                sounds = CollectAudioFilesFromPath("Burp Audio");
-
-            return sounds;
+            return FartModCore.instance.burpCommands.GetAudioClips();
         }
 
-        protected override Vector3 EffectDirection(Player player)
+        protected override Vector3 EffectDirection(GasCharacterModel model)
         {
-            return player._pVisual._playerRaceModel._headBoneTransform.forward;
+            return model.GetHeadTransform().forward;
         }
 
-        protected override Vector3 EffectPosition(Player player)
+        protected override Vector3 EffectPosition(GasCharacterModel model)
         {
-            return player._pVisual._playerRaceModel._headBoneTransform.position;
+            return model.GetHeadTransform().position;
         }
 
         protected override void SetEyeConditions(bool effectEnabled)
         {
-            Player player = GetPlayer();
+            GasCharacterModel model = GetModel();
 
-            if (!player)
+            if (!model)
                 return;
 
             if (effectEnabled)
             {
                 //Expression
                 //Set mouth condition
-                player._pVisual._playerRaceModel.Set_MouthCondition(MouthCondition.Open, 1f);
+                model.SetMouthCondition(MouthCondition.Open, 1f);
             }
             else
             {
                 //Expression
                 //Set mouth condition
-                player._pVisual._playerRaceModel.Set_MouthCondition(MouthCondition.Closed, 1f);
+                model.SetMouthCondition(MouthCondition.Closed, 1f);
             }
         }
     }

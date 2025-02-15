@@ -14,7 +14,7 @@ namespace FartMod
     {
         private static GameObject particleSystemPrefab;
 
-        public Player owner;
+        public GasCharacterModel model;
         private AudioSource audioSource;
 
         private ParticleSystem particleSystem;
@@ -86,7 +86,7 @@ namespace FartMod
             List<AudioClip> sounds = new List<AudioClip>();
 
             Log($"checking folder {Path.GetFileName(path)}");
-            string[] audioFiles = Directory.GetFiles(path);
+            string[] audioFiles = Directory.GetFiles(path, "*.*", SearchOption.AllDirectories);
             foreach (string file in audioFiles)
             {
                 Log($"\tchecking single file {Path.GetFileName(file)}");
@@ -144,53 +144,27 @@ namespace FartMod
             //Set clip and play
             GetAudioSource().clip = clip;
             GetAudioSource().Play();
-
-            Player player = GetPlayer();
-
+            
             //Grab audio source on player and copy values
             AudioSource audioSource = GetAudioSource();
-
-            AudioSource playerAudioSource = player.GetComponentInChildren<AudioSource>();
-            if (playerAudioSource)
-            {
-                //audioSource.outputAudioMixerGroup = playerAudioSource.outputAudioMixerGroup;
-                audioSource.spatialBlend = playerAudioSource.spatialBlend;
-            }
+            audioSource.spatialBlend = 1;
 
             enabled = true;
         }
 
-        protected virtual Vector3 EffectDirection(Player player)
+        protected virtual Vector3 EffectDirection(GasCharacterModel model)
         {
-            Vector3 averagePosition = Vector3.zero;
-
-            DynamicBone[] assBones = player._pVisual._playerRaceModel._assDynamicBones;
-            for (int i = 0; i < assBones.Length; i++)
-            {
-                DynamicBone assBone = assBones[i];
-                averagePosition += assBone.m_Root.up;
-            }
-
-            return (averagePosition / assBones.Length);
+            return model.AssDirection();
         }
 
-        protected virtual Vector3 EffectPosition(Player player)
+        protected virtual Vector3 EffectPosition(GasCharacterModel model)
         {
-            Vector3 averagePosition = Vector3.zero;
-
-            DynamicBone[] assBones = player._pVisual._playerRaceModel._assDynamicBones;
-            for (int i = 0; i < assBones.Length; i++)
-            {
-                DynamicBone assBone = assBones[i];
-                averagePosition += assBone.transform.position;
-            }
-
-            return (averagePosition / assBones.Length);
+            return model.AssPosition();
         }
 
-        protected Player GetPlayer()
+        protected GasCharacterModel GetModel()
         {
-            return owner;
+            return model;
         }
 
         private void Log(string message, bool force = false)
@@ -274,13 +248,13 @@ namespace FartMod
 
         public void SetTransform(Transform t)
         {
-            Player player = GetPlayer();
+            GasCharacterModel model = GetModel();
 
-            if (!player)
+            if (!model)
                 return;
 
-            t.forward = EffectDirection(player);
-            t.position = EffectPosition(player) + t.forward * .75f;
+            t.forward = EffectDirection(model);
+            t.position = EffectPosition(model) + t.forward * .75f;
         }
 
         private void Update()
@@ -297,9 +271,9 @@ namespace FartMod
                 return;
             }
 
-            Player player = GetPlayer();
+            GasCharacterModel model = GetModel();
 
-            if (!player)
+            if (!model)
             {
                 enabled = false;
                 return;
@@ -348,19 +322,19 @@ namespace FartMod
 
         protected virtual void SetEyeConditions(bool effectEnabled)
         {
-            Player player = GetPlayer();
+            GasCharacterModel model = GetModel();
 
-            if (!player)
+            if (!model)
                 return;
 
             if (effectEnabled)
             {
                 //Expression
                 //Set eye condition
-                player._pVisual._playerRaceModel.Set_EyeCondition(EyeCondition.Closed, 1f);
+                model.SetEyeCondition(EyeCondition.Closed, 1f);
 
                 //Set eye condition
-                player._pVisual._playerRaceModel.Set_MouthCondition(MouthCondition.Closed, 1f);
+                model.SetMouthCondition(MouthCondition.Closed, 1f);
             }
             else 
             {
@@ -370,10 +344,10 @@ namespace FartMod
                 eyeConditions.Add(EyeCondition.Up);
                 eyeConditions.Add(EyeCondition.Closed);
                 EyeCondition eyeCond = eyeConditions[Random.Range(0, eyeConditions.Count)];
-                player._pVisual._playerRaceModel.Set_EyeCondition(eyeCond, 1f);
+                model.SetEyeCondition(eyeCond, 1f);
 
                 //Set eye condition
-                player._pVisual._playerRaceModel.Set_MouthCondition(MouthCondition.Open, 1f);
+                model.SetMouthCondition(MouthCondition.Open, 1f);
             }
         }
 
@@ -421,8 +395,11 @@ namespace FartMod
 
         protected bool IsPlayer()
         {
-            if (owner)
-                return owner.owner == Player._mainPlayer;
+            if (owner) 
+            {
+                if(owner.model is GasPlayerCharacterModel)
+                    return (owner.model as GasPlayerCharacterModel).player == Player._mainPlayer;
+            }
 
             return false;
         }
