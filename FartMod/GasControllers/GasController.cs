@@ -273,6 +273,9 @@ namespace FartMod
 
         public bool CompareOwner(Component owningObject) 
         {
+            if (!model)
+                return false;
+
             return model.owningObject == owningObject;
         }
 

@@ -16,7 +16,7 @@ namespace FartMod
             this.owningObject = owningObject.gameObject;
         }
 
-        public virtual bool IsValid()
+        public bool IsValid()
         {
             return owningObject;
         }
@@ -73,6 +73,9 @@ namespace FartMod
 
         public static implicit operator bool(GasCharacterModel model)
         {
+            if (model == null)
+                return false;
+
             return model.IsValid();
         }
 
