@@ -17,7 +17,7 @@ namespace FartMod
         {
             characterModelTypes.Clear();
 
-            string path = Path.Combine(Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location), "Models");
+            string path = Path.Combine(Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location), "NPC/Models");
             if (Directory.Exists(path))
             {
                 Log($"checking folder {Path.GetFileName(path)}");
