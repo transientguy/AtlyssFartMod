@@ -84,8 +84,28 @@ namespace FartMod
             }
         }
 
+        private bool BonesValid() 
+        {
+            if (!player)
+                return false;
+
+            if (!player._pVisual)
+                return false;
+
+            if (!player._pVisual._playerRaceModel)
+                return false;
+
+            if (player._pVisual._playerRaceModel._assDynamicBones == null)
+                return false;
+
+            return true;
+        }
+
         public override Vector3 AssDirection()
         {
+            if (!BonesValid())
+                return -GetTransform().forward;
+
             return AssDirectionFromDynamicBones(player._pVisual._playerRaceModel._assDynamicBones.ToList(), this);
         }
 
@@ -128,6 +148,9 @@ namespace FartMod
 
         public override Vector3 AssPosition()
         {
+            if (!BonesValid())
+                return GetTransform().position;
+
             return AssPositionFromDynamicBones(player._pVisual._playerRaceModel._assDynamicBones.ToList(), this);
         }
 

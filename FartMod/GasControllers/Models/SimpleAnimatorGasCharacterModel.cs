@@ -31,8 +31,8 @@ namespace FartMod
         {
             if (owningGameObject && owningObject)
                 return owningGameObject == owningObject.gameObject;
-            
-            return false;
+
+            return base.CompareOwner(owningObject);
         }
 
         private void Awake()

@@ -28,7 +28,10 @@ namespace FartMod
 
         public virtual bool CompareOwner(Component owningObject) 
         {
-            return this.owningObject == owningObject;
+            if (this.owningObject && owningObject)
+                return this.owningObject.gameObject == owningObject.gameObject;
+            
+            return false;
         }
 
         public virtual void OnDelete() 

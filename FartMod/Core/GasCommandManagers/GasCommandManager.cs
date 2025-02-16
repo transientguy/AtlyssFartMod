@@ -82,10 +82,12 @@ namespace FartMod.Core.GasCommandManagers
             FartCommands.AddHostCommand("global" + verb + "volume", "", SetGlobalGasVolume);
             FartCommands.AddHostCommand(verb + "size", "", SetGasParticleSize);
 
+            /*
             //NPCs
             string npcStr = "npc";
             FartCommands.AddHostCommand(npcStr + verb, "", NPCGasLoopInfinite);
             FartCommands.AddHostCommand(npcStr + "stop" + verb + "ing", "", NPCStopGas);
+            */
 
             string interactStr = "interact";
             FartCommands.AddHostCommand(interactStr + verb, "", InteractGasLoopInfinite);
