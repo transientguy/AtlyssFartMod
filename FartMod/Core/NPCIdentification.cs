@@ -5,6 +5,7 @@ using System.IO;
 using System.Linq;
 using System.Reflection;
 using System.Text;
+using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using UnityEngine;
 
@@ -21,43 +22,42 @@ namespace FartMod
 
         public static void InitializeDictionary() 
         {
-            string path = Path.Combine(Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location), "NPC");
-            if (Directory.Exists(path))
+            string path = Path.Combine(Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location), "NPC/NPC IDs.txt");
+            if (File.Exists(path))
             {
-                GetAllLinesAtPath(path);
+                NPCIDS = AssetUtils.GetParameterDictionaryFromFile(path);
             }
             else
             {
-                Log($"Directory {path} does not exist! Creating.");
-                Directory.CreateDirectory(path);
+                Log($"File {path} does not exist!");
             }
         }
 
-        public static List<string> GetAllLinesAtPath(string path)
+        public static string StripNetID(string str) 
         {
-            List<string> allLines = new List<string>();
-
-            Log($"checking folder {Path.GetFileName(path)}");
-            string[] files = Directory.GetFiles(path);
-            foreach (string file in files)
-            {
-                Log($"\tchecking single file {Path.GetFileName(file)}");
-                NPCIDS = AssetUtils.GetParameterDictionaryFromFile(file);
-            }
-
-            return allLines;
+            string output = Regex.Replace(str, @" ?\[.*?\]", string.Empty);
+            output = output.Trim();
+            //Debug.LogError("Stripped net ID = " + output);
+            return output;
         }
 
         public static GameObject GetNPC(string key) 
         {
+            key = key.Trim();
+
+            //Debug.LogError("Looking for " + key);
+
             if (NPCIDS.ContainsKey(key)) 
             {
                 foreach (string str in NPCIDS[key]) 
                 {
                     GameObject g = GameObject.Find(str);
 
-                    if (g)
+                    if (g) 
+                    {
+                        //Debug.LogError("found " + key + " was " + str);
                         return g;
+                    }
                 }
             }
 

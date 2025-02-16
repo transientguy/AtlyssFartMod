@@ -78,6 +78,11 @@ namespace FartMod
         {
             config = config.Replace(" ", "");
             List<string> colorHexa = config.Split(',').ToList();
+            return GetColorsFromHexaList(colorHexa);
+        }
+
+        public static List<Color> GetColorsFromHexaList(List<string> colorHexa) 
+        {
             List<Color> colors = new List<Color>();
 
             foreach (string str in colorHexa)

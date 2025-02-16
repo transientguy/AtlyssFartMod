@@ -161,7 +161,7 @@ namespace FartMod
             GetFartEffectsManager().StartEffect();
         }
 
-        protected virtual GasEffectsManager GetFartEffectsManager()
+        public virtual GasEffectsManager GetFartEffectsManager()
         {
             if (!fartEffectsManager)
             {
@@ -276,7 +276,7 @@ namespace FartMod
             if (!model)
                 return false;
 
-            return model.owningObject == owningObject;
+            return model.CompareOwner(owningObject);
         }
 
         public void SetOwner(Component owningObject, AssetBundle bundle)

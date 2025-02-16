@@ -1,5 +1,4 @@
 ﻿using BepInEx.Configuration;
-using FartMod.GasControllers.Burps;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -32,6 +31,9 @@ namespace FartMod.Core.GasCommandManagers
                 GasController controller = BurpController.allBurpControllers.Find(x => x.CompareOwner(owningObject));
                 if (!controller)
                 {
+                    if (!GasCharacterModel.CanMakeModel(owningObject))
+                        return null;
+
                     controller = GameObject.Instantiate(GetOriginalGasController());
                     controller.gameObject.SetActive(true);
                     controller.SetOwner(owningObject, FartModCore.instance.GetAssetBundle());

@@ -9,8 +9,8 @@ using HarmonyLib;
 using System;
 using Mirror;
 using BepInEx.Configuration;
-using FartMod.GasControllers.Burps;
 using FartMod.Core.GasCommandManagers;
+using UnityEngine.Events;
 
 namespace FartMod
 {
@@ -23,6 +23,7 @@ namespace FartMod
         public static FartModCore instance;
         public FartCommandManager fartCommands = new FartCommandManager();
         public BurpCommandManager burpCommands = new BurpCommandManager();
+        public static UnityEvent onConfigRebind = new UnityEvent();
         private AssetBundle bundle;
 
         public static void Log(string message, bool forcePlay = false)
@@ -47,6 +48,7 @@ namespace FartMod
                 throw;
             }
 
+            NPCFartConfig.LoadConfigEntries();
             GasCharacterModelTypes.GetCharacterModelTypes();
             NPCIdentification.InitializeDictionary();
             fartCommands.Initialize();
@@ -60,18 +62,16 @@ namespace FartMod
         {
             FartCommands.AddHostCommand("rebind", "", Rebind);
             FartCommands.AddHostCommand("allAnims", "", AllAnims);
-            FartCommands.AddHostCommand("updatemodels", "", UpdateModels);
-        }
-
-        private void UpdateModels(ChatBehaviour chatBehaviour, List<string> parameters) 
-        {
-            GasCharacterModelTypes.GetCharacterModelTypes();
         }
 
         private void Rebind(ChatBehaviour chatBehaviour, List<string> parameters) 
         {
-            Log("Config file rebound!");
             GetConfig().Reload();
+            NPCFartConfig.LoadConfigEntries();
+            GasCharacterModelTypes.GetCharacterModelTypes();
+            NPCIdentification.InitializeDictionary();
+            onConfigRebind.Invoke();
+            Log("Config file rebound!");
         }
 
         private void AllAnims(ChatBehaviour chatBehaviour, List<string> parameters)

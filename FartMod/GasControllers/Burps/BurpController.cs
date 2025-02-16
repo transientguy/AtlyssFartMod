@@ -5,7 +5,7 @@ using System.Text;
 using System.Threading.Tasks;
 using UnityEngine;
 
-namespace FartMod.GasControllers.Burps
+namespace FartMod
 {
     public class BurpController : GasController
     {
@@ -22,7 +22,7 @@ namespace FartMod.GasControllers.Burps
             allBurpControllers.Remove(this);
         }
 
-        protected override GasEffectsManager GetFartEffectsManager()
+        public override GasEffectsManager GetFartEffectsManager()
         {
             if (!fartEffectsManager)
             {

@@ -16,9 +16,19 @@ namespace FartMod
             this.owningObject = owningObject.gameObject;
         }
 
-        public bool IsValid()
+        public virtual FartEffectsConfiguration GetFartEffectsConfiguration(FartEffectsManager controller)
         {
-            return owningObject;
+            return new FartEffectsConfiguration(controller);
+        }
+
+        public virtual BurpEffectsConfiguration GetBurpEffectsConfiguration(BurpEffectsManager controller)
+        {
+            return new BurpEffectsConfiguration(controller);
+        }
+
+        public virtual bool CompareOwner(Component owningObject) 
+        {
+            return this.owningObject == owningObject;
         }
 
         public virtual void OnDelete() 
@@ -93,6 +103,7 @@ namespace FartMod
             if (anim) 
             {
                 model = ownerGameObject.AddComponent<SimpleAnimatorGasCharacterModel>();
+                (model as SimpleAnimatorGasCharacterModel).owningGameObject = owningObject.gameObject;
                 model.Initialize(anim);
                 return model;
             }
@@ -100,6 +111,20 @@ namespace FartMod
             model = ownerGameObject.AddComponent<GasCharacterModel>();
             model.Initialize(owningObject);
             return model;
+        }
+
+        public static bool CanMakeModel(Component owningObject)
+        {
+            Player p;
+            owningObject.gameObject.TryGetComponent(out p);
+            if (p)
+                return true;
+
+            Animator anim = owningObject.GetComponentInChildren<Animator>();
+            if (anim)
+                return true;
+
+            return false;
         }
     }
 }

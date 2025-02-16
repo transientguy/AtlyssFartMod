@@ -30,6 +30,21 @@ namespace FartMod
         //Network Audio
         //Network Particles
 
+        private void Awake() 
+        {
+            FartModCore.onConfigRebind.AddListener(RebindConfig);
+        }
+
+        private void RebindConfig() 
+        {
+            configuration = GetGasEffectsConfiguration();
+        }
+
+        private void OnDestroy() 
+        {
+            FartModCore.onConfigRebind.RemoveListener(RebindConfig);
+        }
+
         protected virtual GasEffectsConfiguration GetGasEffectsConfiguration() 
         {
             return new GasEffectsConfiguration(this);

@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Reflection;
@@ -54,6 +55,7 @@ namespace FartMod
 
         public void SetInfo(string file) 
         {
+            name = Path.GetFileName(file);
             Dictionary<string, List<string>> data = AssetUtils.GetParameterDictionaryFromFile(file);
 
             string bonesKey = "Bones";
@@ -100,10 +102,31 @@ namespace FartMod
 
             return false;
         }
+
+        public override Transform GetHeadBone(SimpleAnimatorGasCharacterModel model)
+        {
+            if (model.skinnedMeshRenderers.Any()) 
+            {
+                return Array.Find(model.skinnedMeshRenderers[0].bones, x => x.name == headBone);
+            }
+
+            return base.GetHeadBone(model);
+        }
+
+        public override List<Transform> GetAssBones(SimpleAnimatorGasCharacterModel model)
+        {
+            if (model.skinnedMeshRenderers.Any())
+            {
+                return Array.FindAll(model.skinnedMeshRenderers[0].bones, x => assBones.Contains(x.name)).ToList();
+            }
+
+            return new List<Transform>();
+        }
     }
 
     public class GasCharacterModelType
     {
+        public string name;
         public string headBone;
         public List<string> assBones = new List<string>();
 
@@ -119,12 +142,12 @@ namespace FartMod
 
         public virtual Transform GetHeadBone(SimpleAnimatorGasCharacterModel model) 
         {
-            return null;
+            return model.GetTransform();
         }
 
         public virtual List<Transform> GetAssBones(SimpleAnimatorGasCharacterModel model)
         {
-            return null;
+            return new List<Transform>();
         }
     }
 }

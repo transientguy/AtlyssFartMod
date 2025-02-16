@@ -8,6 +8,7 @@ using System.Reflection;
 using System.Text;
 using System.Threading.Tasks;
 using UnityEngine;
+using UnityEngine.Events;
 using static FartMod.FartModCore;
 
 namespace FartMod.Core.GasCommandManagers
@@ -83,12 +84,13 @@ namespace FartMod.Core.GasCommandManagers
 
             //NPCs
             string npcStr = "npc";
-            FartCommands.AddCommand(npcStr + verb, "", NPCGasLoopInfinite);
-            FartCommands.AddCommand(npcStr + "stop" + verb + "ing", "", NPCStopGas);
+            FartCommands.AddHostCommand(npcStr + verb, "", NPCGasLoopInfinite);
+            FartCommands.AddHostCommand(npcStr + "stop" + verb + "ing", "", NPCStopGas);
 
+            //Targets
             string targetStr = "target";
-            FartCommands.AddCommand(targetStr + verb, "", TargetGasLoopInfinite);
-            FartCommands.AddCommand(targetStr + "stop" + verb + "ing", "", TargetStopGas);
+            FartCommands.AddHostCommand(targetStr + verb, "", TargetGasLoopInfinite);
+            FartCommands.AddHostCommand(targetStr + "stop" + verb + "ing", "", TargetStopGas);
 
             GetOriginalGasController();
             GetAudioClips();
@@ -102,6 +104,9 @@ namespace FartMod.Core.GasCommandManagers
                 GasController controller = FartController.allFartControllers.Find(x => x.CompareOwner(owningObject));
                 if (!controller)
                 {
+                    if (!GasCharacterModel.CanMakeModel(owningObject))
+                        return null;
+
                     controller = GameObject.Instantiate(GetOriginalGasController());
                     controller.gameObject.SetActive(true);
                     controller.SetOwner(owningObject, FartModCore.instance.GetAssetBundle());
@@ -236,7 +241,7 @@ namespace FartMod.Core.GasCommandManagers
 
         private void NPCGasLoopInfinite(Component owningObject, List<string> parameters)
         {
-            if (parameters.Any()) 
+            if (parameters.Any())
             {
                 string NPCKey = parameters[0];
                 GameObject NPC = NPCIdentification.GetNPC(NPCKey);
@@ -254,34 +259,75 @@ namespace FartMod.Core.GasCommandManagers
                 GameObject NPC = NPCIdentification.GetNPC(NPCKey);
 
                 if (NPC)
-                    NPCStopGas(NPC.transform, parameters);
+                    StopGas(NPC.transform, parameters);
             }
         }
 
-        public StatusEntity GetTarget(Component owningObject)
+        private IEnumerator DelayAction(UnityAction action) 
+        {
+            yield return new WaitForSeconds(.25f);
+            action.Invoke();
+        }
+
+        public GameObject GetTarget(Component owningObject)
         {
             Player player = owningObject.GetComponent<Player>();
 
-            if (player)
-                return player._pTargeting._foundEntity;
+            if (player) 
+            {
+                if (player._pTargeting._foundEntity)
+                {
+                    Creep c = player._pTargeting._foundEntity.GetComponent<Creep>();
+
+                    if (c)
+                    {
+                        Log(c.ToString());
+                        return c._creepObject;
+                    }
+                }
+                else 
+                {
+                    Log("No entity found");
+                    //Debug.LogError(player._pTargeting._foundEntity);
+                    //Debug.LogError(player._pTargeting._targetedEntity);
+                    //Debug.LogError(player._pTargeting._syncSelectedEntity);
+                    //Debug.LogError(player._pTargeting.Network_syncSelectedEntity);
+                }
+            }
 
             return null;
         }
 
         private void TargetGasLoopInfinite(Component owningObject, List<string> parameters)
         {
-            StatusEntity target = GetTarget(owningObject);
+            UnityAction action = delegate
+            {
+                if (!owningObject)
+                    return;
 
-            if (target)
-                GasLoopInfinite(target, parameters);
+                GameObject target = GetTarget(owningObject);
+
+                if (target)
+                    GasLoopInfinite(target.transform, parameters);
+            };
+
+            FartModCore.instance.StartCoroutine(DelayAction(action));
         }
 
         private void TargetStopGas(Component owningObject, List<string> parameters)
         {
-            StatusEntity target = GetTarget(owningObject);
+            UnityAction action = delegate
+            {
+                if (!owningObject)
+                    return;
 
-            if (target)
-                StopGas(target, parameters);
+                GameObject target = GetTarget(owningObject);
+
+                if (target)
+                    StopGas(target.transform, parameters);
+            };
+
+            FartModCore.instance.StartCoroutine(DelayAction(action));
         }
 
         protected GasController GetOriginalGasController()

@@ -146,7 +146,7 @@ namespace FartMod
 
             foreach(string str in lines) 
             {
-                List<string> splitHeader = str.Split(':').ToList();
+                List<string> splitHeader = str.Split('=').ToList();
 
                 if (splitHeader.Count >= 2) 
                 {

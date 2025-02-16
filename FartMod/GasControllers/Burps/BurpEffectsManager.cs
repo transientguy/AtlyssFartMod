@@ -5,12 +5,15 @@ using System.Text;
 using System.Threading.Tasks;
 using UnityEngine;
 
-namespace FartMod.GasControllers.Burps
+namespace FartMod
 {
     public class BurpEffectsManager : GasEffectsManager
     {
         protected override GasEffectsConfiguration GetGasEffectsConfiguration()
         {
+            if(model)
+                return model.GetBurpEffectsConfiguration(this);
+
             return new BurpEffectsConfiguration(this);
         }
 

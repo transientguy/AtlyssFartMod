@@ -24,7 +24,7 @@ namespace FartMod
             allFartControllers.Remove(this);
         }
 
-        protected override GasEffectsManager GetFartEffectsManager()
+        public override GasEffectsManager GetFartEffectsManager()
         {
             if (!fartEffectsManager)
             {

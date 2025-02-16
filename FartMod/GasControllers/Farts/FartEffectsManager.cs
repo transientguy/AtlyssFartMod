@@ -18,6 +18,9 @@ namespace FartMod
 
         protected override GasEffectsConfiguration GetGasEffectsConfiguration()
         {
+            if(model)
+                return model.GetFartEffectsConfiguration(this);
+
             return new FartEffectsConfiguration(this);
         }
 
@@ -89,7 +92,7 @@ namespace FartMod
             jiggleMultiplier = (float)Configuration.JiggleIntensity.DefaultValue;
         }
 
-        public float GetJiggleMultiplier()
+        public virtual float GetJiggleMultiplier()
         {
             if (IsPlayer())
                 return Configuration.JiggleIntensity.Value;
