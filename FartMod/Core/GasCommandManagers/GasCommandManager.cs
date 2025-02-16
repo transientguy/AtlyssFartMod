@@ -87,6 +87,10 @@ namespace FartMod.Core.GasCommandManagers
             FartCommands.AddHostCommand(npcStr + verb, "", NPCGasLoopInfinite);
             FartCommands.AddHostCommand(npcStr + "stop" + verb + "ing", "", NPCStopGas);
 
+            string interactStr = "interact";
+            FartCommands.AddHostCommand(interactStr + verb, "", InteractGasLoopInfinite);
+            FartCommands.AddHostCommand(interactStr + "stop" + verb + "ing", "", InteractStopGas);
+
             //Targets
             string targetStr = "target";
             FartCommands.AddHostCommand(targetStr + verb, "", TargetGasLoopInfinite);
@@ -328,6 +332,54 @@ namespace FartMod.Core.GasCommandManagers
             };
 
             FartModCore.instance.StartCoroutine(DelayAction(action));
+        }
+
+        public Transform GetInteractTarget(Component owningObject)
+        {
+            PlayerInteract player = owningObject.GetComponent<PlayerInteract>();
+
+            if (player)
+            {
+                FieldInfo myFieldInfo = typeof(PlayerInteract).GetField("_interactableObj", BindingFlags.NonPublic | BindingFlags.Instance);
+                Transform value = myFieldInfo.GetValue(player) as Transform;
+
+                if (value) 
+                {
+                    NetNPC netNPC = value.GetComponentInParent<NetNPC>();
+                    if (netNPC)
+                        return netNPC.transform;
+
+                    Animator anim = value.GetComponentInParent<Animator>();
+                    if (anim)
+                        return anim.transform;
+
+                    return value;
+                }
+            }
+
+            return null;
+        }
+
+        private void InteractGasLoopInfinite(Component owningObject, List<string> parameters)
+        {
+            if (!owningObject)
+                return;
+
+            Transform target = GetInteractTarget(owningObject);
+
+            if (target)
+                GasLoopInfinite(target.transform, parameters);
+        }
+
+        private void InteractStopGas(Component owningObject, List<string> parameters)
+        {
+            if (!owningObject)
+                return;
+
+            Transform target = GetInteractTarget(owningObject);
+
+            if (target)
+                StopGas(target.transform, parameters);
         }
 
         protected GasController GetOriginalGasController()
