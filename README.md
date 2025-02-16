@@ -102,4 +102,8 @@ GlobalBurpVolume: Volume of all character burps
 
 /targetstopburping - stops the infinite loop of burping on your current enemy target
 
+### NPC Config Files
+
+New NPC config files found in FartMod\NPC\Config. This allows you to change specific properdies of the effects on NPCs. Look to the Config File section of the README for more info. 
+At the moment you can only change the properties of the characters: Angela, Vivian, Sally, and Slime Diva 
 
