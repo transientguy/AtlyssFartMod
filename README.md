@@ -82,3 +82,24 @@ BurpChaos: Experimental mode that makes all multiplayer character's burp when th
 
 GlobalBurpVolume: Volume of all character burps
 
+### NPC Commands
+
+/interactfart - starts an infinite loop of farting on your current interactable target
+
+/interactstopfarting - stops the infinite loop of farting on your current interactable target
+
+/interactburp - starts an infinite loop of burping on your current interactable target
+
+/interactstopburping - stops the infinite loop of burping on your current interactable target
+
+### Enemy stuff experimental!
+
+/targetfart - starts an infinite loop of farting on your current enemy target
+
+/targetstopfarting - stops the infinite loop of farting on your current enemy target
+
+/targetburp - starts an infinite loop of burping on your current enemy target
+
+/targetstopburping - stops the infinite loop of burping on your current enemy target
+
+
