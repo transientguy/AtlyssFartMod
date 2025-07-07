@@ -34,8 +34,9 @@
     <Reference Include="0Harmony">
       <HintPath>..\Libraries\0Harmony.dll</HintPath>
     </Reference>
-    <Reference Include="Assembly-CSharp">
-      <HintPath>..\Libraries\Assembly-CSharp.dll</HintPath>
+    <Reference Include="Assembly-CSharp, Version=0.0.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\..\..\AtlyssFluidsMod\AtlyssFluidsMod\Libraries\Assembly-CSharp.dll</HintPath>
     </Reference>
     <Reference Include="BepInEx">
       <HintPath>..\Libraries\BepInEx.dll</HintPath>

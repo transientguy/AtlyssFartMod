@@ -39,6 +39,40 @@ namespace FartMod
             return null;
         }
 
+        protected AnimationClip GetAnimationClip(string animName)
+        {
+            GasCharacterModel model = GetModel();
+            if (model)
+            {
+                Animator animator = model.GetRaceAnimator();
+
+                foreach (AnimationClip item in animator.runtimeAnimatorController.animationClips)
+                {
+                    if (item.name == animName)
+                        return item;
+                }
+            }
+
+            return null;
+        }
+
+        protected AnimationClip GetAnimationClipByKeyword(string keyword)
+        {
+            GasCharacterModel model = GetModel();
+            if (model)
+            {
+                Animator animator = model.GetRaceAnimator();
+
+                foreach (AnimationClip item in animator.runtimeAnimatorController.animationClips)
+                {
+                    if (item.name.Contains(keyword))
+                        return item;
+                }
+            }
+
+            return null;
+        }
+
         public void FartOneshot()
         {
             StopAllCoroutines();

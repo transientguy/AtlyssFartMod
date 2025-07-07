@@ -40,11 +40,15 @@ namespace FartMod
         {
             List<AnimationSequence> animationSequences = new List<AnimationSequence>();
 
-            AnimationClip butt1 = GetAnimationClip(77);
+            AnimationClip butt1 = GetAnimationClipByKeyword("_bottomSurprise");
             if (butt1)
                 animationSequences.Add(new AnimationSequence(butt1, false));
 
-            AnimationClip butt2 = GetAnimationClip(76);
+            AnimationClip butt2 = GetAnimationClipByKeyword("_bottomCheckCC");
+
+            if(!butt2)
+                butt2 = GetAnimationClipByKeyword("_bottomIdle");
+
             if (butt2)
                 animationSequences.Add(new AnimationSequence(butt2, true));
             
