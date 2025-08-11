@@ -120,10 +120,18 @@ namespace FartMod
                 audioSource = FartController.AddAndGetComponent<AudioSource>(gameObject);
 
             if (audioSource)
+            {
                 audioSource.volume = configuration.GetVolume();
+                audioSource.spatialBlend = 0.8f;
+                audioSource.rolloffMode = AudioRolloffMode.Linear;
+                audioSource.minDistance = 2.5f;
+                audioSource.maxDistance = 25f;
+                audioSource.dopplerLevel = 0.2f;
+            }
 
             return audioSource;
         }
+
 
         private ParticleSystem GetParticleSystem()
         {
@@ -165,6 +173,30 @@ namespace FartMod
             audioSource.spatialBlend = 1;
 
             enabled = true;
+        }
+
+        public AudioClip StartEffectAndReturnClip()
+        {
+            if (!GetAudioClips().Any())
+            {
+                Log("No clips found of either farts or burps!");
+                return null;
+            }
+
+            counter = 0;
+
+            int randIndex = Random.Range(0, GetAudioClips().Count);
+            AudioClip clip = GetAudioClips()[randIndex];
+
+            GetAudioSource().clip = clip;
+            GetAudioSource().Play();
+
+            AudioSource audioSource = GetAudioSource();
+            audioSource.spatialBlend = 1;
+
+            enabled = true;
+
+            return clip;
         }
 
         protected virtual Vector3 EffectDirection(GasCharacterModel model)

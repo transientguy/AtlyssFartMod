@@ -222,10 +222,10 @@ namespace FartMod
         {
             return model;
         }
-
+        
         private IEnumerator FartLoopInfiniteRoutine()
         {
-            yield return new WaitForSeconds(.5f);
+            yield return new WaitForSeconds(0.5f);
 
             while (true)
             {
@@ -235,8 +235,15 @@ namespace FartMod
                     break;
                 }
 
-                Fart();
-                float delayTime = UnityEngine.Random.Range(2f, 5f);
+                AudioClip clip = GetFartEffectsManager().StartEffectAndReturnClip();
+
+                float minWait = Configuration.GasMinimumWait.Value;
+                float maxWait = Configuration.GasMaximumWait.Value;
+
+                float delayTime = clip != null
+                    ? clip.length + UnityEngine.Random.Range(minWait, maxWait)
+                    : UnityEngine.Random.Range(2f, 5f);
+
                 yield return new WaitForSeconds(delayTime);
             }
         }

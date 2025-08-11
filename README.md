@@ -50,6 +50,12 @@ BepInEx 5
 
 ### Config File
 
+### Global
+
+GasMinimumWait: The minimum amount of time before another fart / burp occurs
+
+GasMaximumWait: The maximum amount of time before another fart / burp occurs
+
 ### Farts
 
 Config file located: ATLYSS\BepInEx\config\TransientGuy.Atlyss.FartMod.cfg
