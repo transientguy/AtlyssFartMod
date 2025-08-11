@@ -8,6 +8,10 @@ namespace FartMod
 {
     internal static class Configuration
     {
+        //Global
+        public static ConfigEntry<float> GasMinimumWait = null;
+        public static ConfigEntry<float> GasMaximumWait = null;
+
         //Farting
         public static ConfigEntry<float> FartVolume = null;
         public static ConfigEntry<float> FartParticleSize = null;
@@ -31,8 +35,12 @@ namespace FartMod
 
         internal static void BindConfiguration()
         {
+            //Shared
+            GasMinimumWait = FartModCore.GetConfig().Bind("Global", "GasMinimumWait", 1.00f, "The minimum amount of time before another fart occurs.");
+            GasMaximumWait = FartModCore.GetConfig().Bind("Global", "GasMaximumWait", 2.00f, "The maximum amount of time before another fart occurs.");
+            
             //Player burp effects
-            FartVolume = FartModCore.GetConfig().Bind("Fart Effects", "FartVolume", 0.08f, "The volume of your character's farts");
+            FartVolume = FartModCore.GetConfig().Bind("Fart Effects", "FartVolume", 0.32f, "The volume of your character's farts.");
             FartParticleSize = FartModCore.GetConfig().Bind("Fart Effects", "FartParticleSize", .075f, "The size of the fart particle effect.");
             JiggleIntensity = FartModCore.GetConfig().Bind("Fart Effects", "JiggleIntensity", 1f, "Multiplier for how intense your butt jiggles from farts.");
 
