@@ -1,0 +1,71 @@
+{
+  "Version": 1,
+  "WorkspaceRootPath": "C:\\Users\\austi\\OneDrive\\Documentos\\GitHub\\AtlyssFartMod\\",
+  "Documents": [
+    {
+      "AbsoluteMoniker": "D:0:0:{9955CA6D-C427-470F-80ED-9C0C104267E2}|FartMod\\FartMod.csproj|c:\\users\\austi\\onedrive\\documentos\\github\\atlyssfartmod\\fartmod\\core\\fartmodcore.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{9955CA6D-C427-470F-80ED-9C0C104267E2}|FartMod\\FartMod.csproj|solutionrelative:fartmod\\core\\fartmodcore.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{9955CA6D-C427-470F-80ED-9C0C104267E2}|FartMod\\FartMod.csproj|c:\\users\\austi\\onedrive\\documentos\\github\\atlyssfartmod\\fartmod\\core\\configuration.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{9955CA6D-C427-470F-80ED-9C0C104267E2}|FartMod\\FartMod.csproj|solutionrelative:fartmod\\core\\configuration.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{9955CA6D-C427-470F-80ED-9C0C104267E2}|FartMod\\FartMod.csproj|c:\\users\\austi\\onedrive\\documentos\\github\\atlyssfartmod\\fartmod\\core\\assetutils.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{9955CA6D-C427-470F-80ED-9C0C104267E2}|FartMod\\FartMod.csproj|solutionrelative:fartmod\\core\\assetutils.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    }
+  ],
+  "DocumentGroupContainers": [
+    {
+      "Orientation": 0,
+      "VerticalTabListWidth": 256,
+      "DocumentGroups": [
+        {
+          "DockedWidth": 200,
+          "SelectedChildIndex": 0,
+          "Children": [
+            {
+              "$type": "Document",
+              "DocumentIndex": 0,
+              "Title": "FartModCore.cs",
+              "DocumentMoniker": "C:\\Users\\austi\\OneDrive\\Documentos\\GitHub\\AtlyssFartMod\\FartMod\\Core\\FartModCore.cs",
+              "RelativeDocumentMoniker": "FartMod\\Core\\FartModCore.cs",
+              "ToolTip": "C:\\Users\\austi\\OneDrive\\Documentos\\GitHub\\AtlyssFartMod\\FartMod\\Core\\FartModCore.cs",
+              "RelativeToolTip": "FartMod\\Core\\FartModCore.cs",
+              "ViewState": "AgIAACYAAAAAAAAAAAAwwAAAAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2025-10-11T00:02:39.037Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 1,
+              "Title": "Configuration.cs",
+              "DocumentMoniker": "C:\\Users\\austi\\OneDrive\\Documentos\\GitHub\\AtlyssFartMod\\FartMod\\Core\\Configuration.cs",
+              "RelativeDocumentMoniker": "FartMod\\Core\\Configuration.cs",
+              "ToolTip": "C:\\Users\\austi\\OneDrive\\Documentos\\GitHub\\AtlyssFartMod\\FartMod\\Core\\Configuration.cs",
+              "RelativeToolTip": "FartMod\\Core\\Configuration.cs",
+              "ViewState": "AgIAAB8AAAAAAAAAAAA1wAAAAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2025-10-11T00:02:29.933Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 2,
+              "Title": "AssetUtils.cs",
+              "DocumentMoniker": "C:\\Users\\austi\\OneDrive\\Documentos\\GitHub\\AtlyssFartMod\\FartMod\\Core\\AssetUtils.cs",
+              "RelativeDocumentMoniker": "FartMod\\Core\\AssetUtils.cs",
+              "ToolTip": "C:\\Users\\austi\\OneDrive\\Documentos\\GitHub\\AtlyssFartMod\\FartMod\\Core\\AssetUtils.cs",
+              "RelativeToolTip": "FartMod\\Core\\AssetUtils.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2025-10-11T00:02:27.862Z",
+              "EditorCaption": ""
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

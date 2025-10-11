@@ -20,3 +20,24 @@ G:\Atlyss Mod Dev\AtlyssFartMod\FartMod\FartMod\obj\Debug\FartMod.csproj.CoreCom
 G:\Atlyss Mod Dev\AtlyssFartMod\FartMod\FartMod\obj\Debug\FartMod.csproj.CopyComplete
 G:\Atlyss Mod Dev\AtlyssFartMod\FartMod\FartMod\obj\Debug\FartMod.dll
 G:\Atlyss Mod Dev\AtlyssFartMod\FartMod\FartMod\obj\Debug\FartMod.pdb
+C:\Users\austi\OneDrive\Documentos\GitHub\AtlyssFartMod\FartMod\bin\Debug\FartMod.dll
+C:\Users\austi\OneDrive\Documentos\GitHub\AtlyssFartMod\FartMod\bin\Debug\FartMod.pdb
+C:\Users\austi\OneDrive\Documentos\GitHub\AtlyssFartMod\FartMod\bin\Debug\0Harmony.dll
+C:\Users\austi\OneDrive\Documentos\GitHub\AtlyssFartMod\FartMod\bin\Debug\BepInEx.dll
+C:\Users\austi\OneDrive\Documentos\GitHub\AtlyssFartMod\FartMod\bin\Debug\Mirror.Components.dll
+C:\Users\austi\OneDrive\Documentos\GitHub\AtlyssFartMod\FartMod\bin\Debug\Mirror.dll
+C:\Users\austi\OneDrive\Documentos\GitHub\AtlyssFartMod\FartMod\bin\Debug\UnityEngine.AnimationModule.dll
+C:\Users\austi\OneDrive\Documentos\GitHub\AtlyssFartMod\FartMod\bin\Debug\UnityEngine.AssetBundleModule.dll
+C:\Users\austi\OneDrive\Documentos\GitHub\AtlyssFartMod\FartMod\bin\Debug\UnityEngine.AudioModule.dll
+C:\Users\austi\OneDrive\Documentos\GitHub\AtlyssFartMod\FartMod\bin\Debug\UnityEngine.CoreModule.dll
+C:\Users\austi\OneDrive\Documentos\GitHub\AtlyssFartMod\FartMod\bin\Debug\UnityEngine.dll
+C:\Users\austi\OneDrive\Documentos\GitHub\AtlyssFartMod\FartMod\bin\Debug\UnityEngine.ParticleSystemModule.dll
+C:\Users\austi\OneDrive\Documentos\GitHub\AtlyssFartMod\FartMod\bin\Debug\UnityEngine.PhysicsModule.dll
+C:\Users\austi\OneDrive\Documentos\GitHub\AtlyssFartMod\FartMod\bin\Debug\UnityEngine.UnityWebRequestAssetBundleModule.dll
+C:\Users\austi\OneDrive\Documentos\GitHub\AtlyssFartMod\FartMod\bin\Debug\UnityEngine.UnityWebRequestAudioModule.dll
+C:\Users\austi\OneDrive\Documentos\GitHub\AtlyssFartMod\FartMod\bin\Debug\UnityEngine.UnityWebRequestModule.dll
+C:\Users\austi\OneDrive\Documentos\GitHub\AtlyssFartMod\FartMod\obj\Debug\FartMod.csproj.AssemblyReference.cache
+C:\Users\austi\OneDrive\Documentos\GitHub\AtlyssFartMod\FartMod\obj\Debug\FartMod.csproj.CoreCompileInputs.cache
+C:\Users\austi\OneDrive\Documentos\GitHub\AtlyssFartMod\FartMod\obj\Debug\FartMod.csproj.Up2Date
+C:\Users\austi\OneDrive\Documentos\GitHub\AtlyssFartMod\FartMod\obj\Debug\FartMod.dll
+C:\Users\austi\OneDrive\Documentos\GitHub\AtlyssFartMod\FartMod\obj\Debug\FartMod.pdb
